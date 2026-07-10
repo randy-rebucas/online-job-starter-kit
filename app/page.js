@@ -1,7 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { auth } from "@/auth";
 import BuyKitButton from "./BuyKitButton";
+import ImagePreview from "@/components/ImagePreview";
+import Reveal from "@/components/Reveal";
 
 const STARTER_KIT_PRICE_PHP = Number(process.env.STARTER_KIT_PRICE_PHP || 499);
 
@@ -119,98 +120,116 @@ export default async function LandingPage() {
       </section>
 
       <section className="landing-steps">
-        <div className="landing-section-head">
-          <h2 className="section-title" style={{ marginTop: 0, justifyContent: "center" }}>
-            ⚡ How It Works
-          </h2>
-          <p>Three steps from signing up to landing your first client.</p>
-        </div>
+        <Reveal>
+          <div className="landing-section-head">
+            <h2 className="section-title" style={{ marginTop: 0, justifyContent: "center" }}>
+              ⚡ How It Works
+            </h2>
+            <p>Three steps from signing up to landing your first client.</p>
+          </div>
+        </Reveal>
         <div className="grid cols-3">
-          {STEPS.map((s) => (
-            <div className="card landing-step" key={s.num}>
-              <div className="landing-step-num">{s.num}</div>
-              <strong>{s.title}</strong>
-              <p style={{ color: "var(--text-dim)", fontSize: 13.5, marginTop: 6 }}>{s.desc}</p>
-            </div>
+          {STEPS.map((s, i) => (
+            <Reveal key={s.num} delay={i * 120}>
+              <div className="card landing-step">
+                <div className="landing-step-num">{s.num}</div>
+                <strong>{s.title}</strong>
+                <p style={{ color: "var(--text-dim)", fontSize: 13.5, marginTop: 6 }}>{s.desc}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       <section className="landing-download">
-        <div className="grid cols-2 landing-download-grid">
-          <div>
-            <div className="section-title" style={{ marginTop: 0 }}>
-              📦 Get the Complete Starter Kit
+        <Reveal>
+          <div className="grid cols-2 landing-download-grid">
+            <div>
+              <div className="section-title" style={{ marginTop: 0 }}>
+                📦 Get the Complete Starter Kit
+              </div>
+              <h2 className="landing-download-title">Everything in one download.</h2>
+              <p style={{ color: "var(--text-dim)", fontSize: 14.5, lineHeight: 1.6, marginBottom: 18 }}>
+                The full 8-in-1 kit as a PDF you can keep, print, and reference offline — a one-time purchase, plus
+                everything unlocked live in your free dashboard the moment you sign up.
+              </p>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px" }}>
+                {DOWNLOAD_HIGHLIGHTS.map((item) => (
+                  <li key={item} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 8, fontSize: 13.5 }}>
+                    <span style={{ color: "var(--emerald)" }}>✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <BuyKitButton priceLabel={`₱${STARTER_KIT_PRICE_PHP}`} />
             </div>
-            <h2 className="landing-download-title">Everything in one download.</h2>
-            <p style={{ color: "var(--text-dim)", fontSize: 14.5, lineHeight: 1.6, marginBottom: 18 }}>
-              The full 8-in-1 kit as a PDF you can keep, print, and reference offline — a one-time purchase, plus
-              everything unlocked live in your free dashboard the moment you sign up.
-            </p>
-            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px" }}>
-              {DOWNLOAD_HIGHLIGHTS.map((item) => (
-                <li key={item} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 8, fontSize: 13.5 }}>
-                  <span style={{ color: "var(--emerald)" }}>✓</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <BuyKitButton priceLabel={`₱${STARTER_KIT_PRICE_PHP}`} />
+            <div className="landing-download-image">
+              <ImagePreview
+                src="/images/online-kit.png"
+                alt="Online Job Starter Kit — 8-in-1 complete career kit: resume & cover letter templates, AI prompt pack, 30-day roadmap, 50+ job websites, interview questions, and AI tools cheat sheet"
+                width={1536}
+                height={1024}
+                sizes="(max-width: 900px) 100vw, 540px"
+                imgStyle={{ width: "100%", height: "auto", borderRadius: "var(--radius)", boxShadow: "var(--shadow)" }}
+              />
+            </div>
           </div>
-          <div className="landing-download-image">
-            <Image
-              src="/images/online-kit.png"
-              alt="Online Job Starter Kit — 8-in-1 complete career kit: resume & cover letter templates, AI prompt pack, 30-day roadmap, 50+ job websites, interview questions, and AI tools cheat sheet"
-              width={1536}
-              height={1024}
-              sizes="(max-width: 900px) 100vw, 540px"
-              style={{ width: "100%", height: "auto", borderRadius: "var(--radius)", boxShadow: "var(--shadow)" }}
-            />
-          </div>
-        </div>
+        </Reveal>
       </section>
 
       <section className="landing-features">
-        <div className="landing-section-head">
-          <h2 className="section-title" style={{ marginTop: 0, justifyContent: "center" }}>
-            🧰 Everything You Need
-          </h2>
-          <p>One account, six tools — no juggling spreadsheets, docs, and a dozen tabs.</p>
-        </div>
+        <Reveal>
+          <div className="landing-section-head">
+            <h2 className="section-title" style={{ marginTop: 0, justifyContent: "center" }}>
+              🧰 Everything You Need
+            </h2>
+            <p>One account, six tools — no juggling spreadsheets, docs, and a dozen tabs.</p>
+          </div>
+        </Reveal>
         <div className="grid cols-3">
-          {FEATURES.map((f) => (
-            <div className="card" key={f.title}>
-              <div style={{ fontSize: 26, marginBottom: 8 }}>{f.icon}</div>
-              <strong>{f.title}</strong>
-              <p style={{ color: "var(--text-dim)", fontSize: 13.5, marginTop: 6 }}>{f.desc}</p>
-            </div>
+          {FEATURES.map((f, i) => (
+            <Reveal key={f.title} delay={i * 90}>
+              <div className="card">
+                <div style={{ fontSize: 26, marginBottom: 8 }}>{f.icon}</div>
+                <strong>{f.title}</strong>
+                <p style={{ color: "var(--text-dim)", fontSize: 13.5, marginTop: 6 }}>{f.desc}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       <section className="landing-faq">
-        <h2 className="section-title" style={{ marginTop: 0 }}>
-          ❓ Frequently Asked Questions
-        </h2>
-        {FAQS.map((item) => (
-          <details className="landing-faq-item" key={item.q}>
-            <summary>{item.q}</summary>
-            <p>{item.a}</p>
-          </details>
+        <Reveal>
+          <h2 className="section-title" style={{ marginTop: 0 }}>
+            ❓ Frequently Asked Questions
+          </h2>
+        </Reveal>
+        {FAQS.map((item, i) => (
+          <Reveal key={item.q} delay={i * 80}>
+            <details className="landing-faq-item">
+              <summary>{item.q}</summary>
+              <p>{item.a}</p>
+            </details>
+          </Reveal>
         ))}
       </section>
 
       <footer className="landing-footer">
-        <h2 className="landing-footer-title">Ready to start your remote career?</h2>
-        <Link href={session?.user ? "/dashboard" : "/register"} className="btn primary">
-          {session?.user ? "Go to Dashboard" : "Create your free account"}
-        </Link>
+        <Reveal>
+          <h2 className="landing-footer-title">Ready to start your remote career?</h2>
+          <Link href={session?.user ? "/dashboard" : "/register"} className="btn primary">
+            {session?.user ? "Go to Dashboard" : "Create your free account"}
+          </Link>
+        </Reveal>
       </footer>
 
-      <div className="landing-bottombar">
-        <span>📘 Online Job Starter Kit</span>
-        <span>&copy; {new Date().getFullYear()}. Built for people starting from zero.</span>
-      </div>
+      <Reveal>
+        <div className="landing-bottombar">
+          <span>📘 Online Job Starter Kit</span>
+          <span>&copy; {new Date().getFullYear()}. Built for people starting from zero.</span>
+        </div>
+      </Reveal>
     </div>
   );
 }

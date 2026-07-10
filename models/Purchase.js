@@ -7,6 +7,9 @@ const PurchaseSchema = new mongoose.Schema(
     checkoutSessionId: { type: String, index: true },
     email: { type: String, trim: true, lowercase: true },
     amountPhp: { type: Number, required: true },
+    baseAmountPhp: { type: Number, default: null }, // price before discount; null when no code applied
+    discountCode: { type: String, default: null },
+    discountType: { type: String, enum: ["percent", "fixed", null], default: null },
     status: { type: String, enum: ["pending", "paid", "failed"], default: "pending", index: true },
     paidAt: { type: Date, default: null },
   },

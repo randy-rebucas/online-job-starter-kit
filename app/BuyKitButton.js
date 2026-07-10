@@ -5,6 +5,8 @@ import { inputClass } from "@/components/formStyles";
 
 export default function BuyKitButton({ priceLabel }) {
   const [email, setEmail] = useState("");
+  const [discountCode, setDiscountCode] = useState("");
+  const [showDiscount, setShowDiscount] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -16,7 +18,7 @@ export default function BuyKitButton({ priceLabel }) {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, discountCode: discountCode.trim() || undefined }),
       });
       const data = await res.json();
       if (!res.ok || !data.checkoutUrl) {
@@ -42,6 +44,35 @@ export default function BuyKitButton({ priceLabel }) {
         onChange={(e) => setEmail(e.target.value)}
         autoComplete="email"
       />
+      {!showDiscount ? (
+        <button
+          type="button"
+          onClick={() => setShowDiscount(true)}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            textAlign: "left",
+            fontSize: 12,
+            color: "var(--text-dim)",
+            textDecoration: "underline",
+            cursor: "pointer",
+            alignSelf: "flex-start",
+          }}
+        >
+          Have a discount code?
+        </button>
+      ) : (
+        <input
+          type="text"
+          className={inputClass}
+          placeholder="Discount code"
+          value={discountCode}
+          onChange={(e) => setDiscountCode(e.target.value)}
+          autoCapitalize="characters"
+          autoComplete="off"
+        />
+      )}
       <button type="submit" className="btn primary" disabled={loading}>
         {loading ? "Redirecting to payment…" : `⬇️ Buy the Starter Kit — ${priceLabel}`}
       </button>

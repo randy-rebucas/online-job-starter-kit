@@ -434,6 +434,14 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; }
   padding: 16px 32px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  animation: topbarIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes topbarIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-topbar { animation: none; }
 }
 .landing-hero {
   background-image: linear-gradient(120deg, rgba(15, 27, 61, 0.92), rgba(22, 36, 79, 0.94)), url("/images/dashboard.png");
@@ -491,6 +499,15 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; }
 .grid.landing-download-grid { align-items: center; gap: 40px; }
 .landing-download-title { font-size: 26px; font-weight: 800; margin: 6px 0 12px; line-height: 1.3; }
 .landing-download-image { display: flex; justify-content: center; }
+.landing-download-image .image-preview-trigger { animation: floatY 5s ease-in-out infinite; }
+.landing-download-image .image-preview-trigger:hover { animation-play-state: paused; }
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-download-image .image-preview-trigger { animation: none; }
+}
 @media (max-width: 900px) {
   .grid.landing-download-grid { gap: 24px; }
   .landing-download-image { order: -1; }
@@ -569,4 +586,82 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; }
 }
 @media (max-width: 500px) {
   .landing-topbar .brand-sub { display: none; }
+}
+
+.image-preview-trigger {
+  position: relative;
+  display: inline-block;
+  cursor: zoom-in;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.image-preview-trigger img { display: block; }
+.image-preview-zoom {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(15, 27, 61, 0.72);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.image-preview-trigger:hover .image-preview-zoom,
+.image-preview-trigger:focus-visible .image-preview-zoom {
+  transform: scale(1.1);
+  background: var(--coral);
+}
+
+/* Motion */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+.btn { transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.15s ease; }
+.btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255, 107, 74, 0.35); }
+
+.card { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.card[href]:hover,
+.landing-step:hover,
+.landing-features .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(15, 27, 61, 0.12);
+}
+
+.image-preview-trigger img { transition: transform 0.35s ease; }
+.image-preview-trigger:hover img { transform: scale(1.04); }
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.modal-overlay { animation: overlayIn 0.18s ease; }
+.modal-panel { animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay, .modal-panel { animation: none; }
+}
+
+.landing-eyebrow { animation: overlayIn 0.5s ease 0.1s both; }
+.landing-hero h1 { animation: modalIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+.landing-hero p { animation: modalIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
+.landing-hero-ctas { animation: modalIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+.landing-stats { animation: overlayIn 0.6s ease 0.45s both; }
+@media (prefers-reduced-motion: reduce) {
+  .landing-eyebrow, .landing-hero h1, .landing-hero p, .landing-hero-ctas, .landing-stats { animation: none; }
 }

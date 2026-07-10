@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { dbConnect } from "@/lib/mongodb";
 import Purchase from "@/models/Purchase";
 import { createCheckoutSession } from "@/lib/paymongo";
+import { applyDiscountCode, DiscountError } from "@/lib/discounts";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -17,13 +18,37 @@ export async function POST(req) {
   if (email && !EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
+  const discountCodeRaw = typeof body?.discountCode === "string" ? body.discountCode.trim() : "";
 
-  const amountPhp = Number(process.env.STARTER_KIT_PRICE_PHP || 499);
+  const baseAmountPhp = Number(process.env.STARTER_KIT_PRICE_PHP || 499);
   const baseUrl = process.env.NEXTAUTH_URL || new URL(req.url).origin;
   const reference = crypto.randomUUID();
 
+  let amountPhp = baseAmountPhp;
+  let appliedDiscount = null;
+  if (discountCodeRaw) {
+    try {
+      const result = await applyDiscountCode(discountCodeRaw, baseAmountPhp);
+      amountPhp = result.amountPhp;
+      appliedDiscount = result.discount;
+    } catch (err) {
+      if (err instanceof DiscountError) {
+        return NextResponse.json({ error: err.message }, { status: 400 });
+      }
+      throw err;
+    }
+  }
+
   await dbConnect();
-  const purchase = await Purchase.create({ reference, email: email || undefined, amountPhp, status: "pending" });
+  const purchase = await Purchase.create({
+    reference,
+    email: email || undefined,
+    amountPhp,
+    baseAmountPhp: appliedDiscount ? baseAmountPhp : undefined,
+    discountCode: appliedDiscount?.code ?? undefined,
+    discountType: appliedDiscount?.type ?? undefined,
+    status: "pending",
+  });
 
   try {
     const session = await createCheckoutSession({

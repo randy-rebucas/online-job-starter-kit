@@ -5,6 +5,14 @@ const DATA = require("./seed-data.cjs");
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/ojsk";
 
+function maskUri(uri) {
+  try {
+    return uri.replace(/\/\/([^:@/]+):([^@/]+)@/, "//$1:****@");
+  } catch {
+    return uri;
+  }
+}
+
 const ContentSchema = new mongoose.Schema(
   { key: { type: String, required: true, unique: true }, data: mongoose.Schema.Types.Mixed },
   { timestamps: true }
@@ -23,7 +31,7 @@ const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
 async function main() {
   await mongoose.connect(MONGODB_URI);
-  console.log("Connected to", MONGODB_URI);
+  console.log("Connected to", maskUri(MONGODB_URI));
 
   const entries = Object.entries(DATA);
   for (const [key, data] of entries) {

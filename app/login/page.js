@@ -69,9 +69,11 @@ export default function LoginPage() {
         <div className="auth-footer">
           Don&apos;t have an account? <Link href="/register">Create one</Link>
         </div>
-        <div className="auth-footer" style={{ marginTop: 4 }}>
-          Demo account: demo@ojsk.dev / demo1234
-        </div>
+        {process.env.NODE_ENV === "development" && (
+          <div className="auth-footer" style={{ marginTop: 4 }}>
+            Demo account: demo@ojsk.dev / demo1234
+          </div>
+        )}
       </div>
     </div>
   );

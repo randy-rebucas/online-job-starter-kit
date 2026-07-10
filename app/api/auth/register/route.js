@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { dbConnect } from "@/lib/mongodb";
 import User from "@/models/User";
 import UserProgress from "@/models/UserProgress";
+import { reconcileUserPayment } from "@/lib/entitlements";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -38,6 +39,7 @@ export async function POST(req) {
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await User.create({ name: name.trim(), email: normalizedEmail, passwordHash });
   await UserProgress.create({ user: user._id });
+  await reconcileUserPayment(user);
 
   return NextResponse.json({ ok: true });
 }

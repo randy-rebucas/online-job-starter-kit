@@ -6,7 +6,7 @@ import Link from "next/link";
 const MAX_POLLS = 6;
 const POLL_INTERVAL_MS = 2500;
 
-export default function SuccessView({ reference, initialStatus, initialToken }) {
+export default function SuccessView({ reference, initialStatus, initialToken, loggedIn = false }) {
   const [status, setStatus] = useState(initialStatus);
   const [token, setToken] = useState(initialToken || null);
   const [attempt, setAttempt] = useState(0);
@@ -32,9 +32,16 @@ export default function SuccessView({ reference, initialStatus, initialToken }) 
         <div style={{ fontSize: 40, marginBottom: 8 }}>✅</div>
         <div className="auth-title">Payment confirmed</div>
         <p className="auth-sub">Your download is ready — this link expires in 15 minutes.</p>
-        <a href={`/api/download/starter-kit?token=${encodeURIComponent(token)}`} className="btn primary">
-          ⬇️ Download the Starter Kit (PDF)
-        </a>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <a href={`/api/download/starter-kit?token=${encodeURIComponent(token)}`} className="btn primary">
+            ⬇️ Download the Starter Kit (PDF)
+          </a>
+          {loggedIn && (
+            <a href="/dashboard" className="btn subtle">
+              Go to Dashboard
+            </a>
+          )}
+        </div>
         <div className="auth-footer">
           <Link href="/">Back to home</Link>
         </div>

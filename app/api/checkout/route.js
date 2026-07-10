@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { auth } from "@/auth";
 import { dbConnect } from "@/lib/mongodb";
 import Purchase from "@/models/Purchase";
 import { createCheckoutSession } from "@/lib/paymongo";
@@ -14,7 +15,11 @@ export async function POST(req) {
   } catch {
     body = {};
   }
-  const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const authSession = await auth();
+  const sessionEmail = authSession?.user?.email?.toLowerCase().trim();
+
+  const formEmail = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const email = sessionEmail || formEmail;
   if (email && !EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
@@ -43,6 +48,7 @@ export async function POST(req) {
   const purchase = await Purchase.create({
     reference,
     email: email || undefined,
+    user: authSession?.user?.id || undefined,
     amountPhp,
     baseAmountPhp: appliedDiscount ? baseAmountPhp : undefined,
     discountCode: appliedDiscount?.code ?? undefined,

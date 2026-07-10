@@ -24,6 +24,8 @@ const UserSchema = new mongoose.Schema(
     name: String,
     email: { type: String, unique: true, lowercase: true, trim: true },
     passwordHash: String,
+    isPaid: { type: Boolean, default: false },
+    paidAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
@@ -43,8 +45,13 @@ async function main() {
   const existing = await User.findOne({ email: demoEmail });
   if (!existing) {
     const passwordHash = await bcrypt.hash("demo1234", 10);
-    await User.create({ name: "Demo User", email: demoEmail, passwordHash });
-    console.log(`Created demo user: ${demoEmail} / demo1234`);
+    await User.create({ name: "Demo User", email: demoEmail, passwordHash, isPaid: true, paidAt: new Date() });
+    console.log(`Created demo user: ${demoEmail} / demo1234 (pre-paid)`);
+  } else if (!existing.isPaid) {
+    existing.isPaid = true;
+    existing.paidAt = existing.paidAt || new Date();
+    await existing.save();
+    console.log("Demo user backfilled as paid");
   } else {
     console.log("Demo user already exists");
   }

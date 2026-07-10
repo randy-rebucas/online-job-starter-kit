@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { dbConnect } from "@/lib/mongodb";
 import Purchase from "@/models/Purchase";
+import { grantEntitlementForPurchase } from "@/lib/entitlements";
 
 // PayMongo signs webhooks as `Paymongo-Signature: t=<ts>,te=<test_sig>,li=<live_sig>`,
 // where the signed payload is `${ts}.${rawBody}`. Test mode uses `te`, live uses `li`.
@@ -39,10 +40,13 @@ export async function POST(req) {
 
   if (type === "checkout_session.payment.paid" && checkoutSession?.id) {
     await dbConnect();
-    await Purchase.findOneAndUpdate(
-      { checkoutSessionId: checkoutSession.id },
-      { $set: { status: "paid", paidAt: new Date() } }
-    );
+    const purchase = await Purchase.findOne({ checkoutSessionId: checkoutSession.id });
+    if (purchase && purchase.status !== "paid") {
+      purchase.status = "paid";
+      purchase.paidAt = new Date();
+      await purchase.save();
+      await grantEntitlementForPurchase(purchase);
+    }
   }
 
   return NextResponse.json({ received: true });

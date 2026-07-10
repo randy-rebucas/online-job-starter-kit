@@ -4,6 +4,7 @@ const PurchaseSchema = new mongoose.Schema(
   {
     reference: { type: String, required: true, unique: true, index: true },
     product: { type: String, default: "starter-kit" },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null, index: true },
     checkoutSessionId: { type: String, index: true },
     email: { type: String, trim: true, lowercase: true },
     amountPhp: { type: Number, required: true },

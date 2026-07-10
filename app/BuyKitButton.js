@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { inputClass } from "@/components/formStyles";
 
-export default function BuyKitButton({ priceLabel }) {
-  const [email, setEmail] = useState("");
+export default function BuyKitButton({ priceLabel, defaultEmail = "" }) {
+  const [email, setEmail] = useState(defaultEmail);
   const [discountCode, setDiscountCode] = useState("");
   const [showDiscount, setShowDiscount] = useState(false);
   const [loading, setLoading] = useState(false);

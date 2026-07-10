@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { verifyPurchase } from "@/lib/purchases";
 import SuccessView from "./SuccessView";
 
@@ -15,11 +16,16 @@ export default async function DownloadSuccessPage({ searchParams }) {
     );
   }
 
-  const result = await verifyPurchase(ref);
+  const [session, result] = await Promise.all([auth(), verifyPurchase(ref)]);
 
   return (
     <div className="auth-wrap">
-      <SuccessView reference={ref} initialStatus={result.status} initialToken={result.downloadToken} />
+      <SuccessView
+        reference={ref}
+        initialStatus={result.status}
+        initialToken={result.downloadToken}
+        loggedIn={!!session?.user}
+      />
     </div>
   );
 }

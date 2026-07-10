@@ -45,8 +45,8 @@ const STEPS = [
 
 const FAQS = [
   {
-    q: "Is it really free?",
-    a: "Yes. Every feature — the guide, roadmap, prompt pack, document builder, live job boards, and trackers — is available on your account with no paywall.",
+    q: "Is it a subscription?",
+    a: "No — it's a one-time payment for lifetime access. Pay once and every feature — the guide, roadmap, prompt pack, document builder, live job boards, and trackers — is yours forever, with no recurring fees.",
   },
   {
     q: "Do I need prior experience?",
@@ -59,6 +59,18 @@ const FAQS = [
   {
     q: "Can I export what I build?",
     a: "Yes. The Document Builder saves multiple versions of your resume, cover letters, and proposals, and can export your resume as an actual PDF.",
+  },
+  {
+    q: "What payment methods do you accept?",
+    a: "Card, GCash, and Maya, processed securely through PayMongo — you never enter payment details on our site, only on PayMongo's own hosted checkout page.",
+  },
+  {
+    q: "Do you offer discounts?",
+    a: "Yes — enter a discount code at checkout under \"Have a discount code?\" and the reduced price is applied before you're taken to payment.",
+  },
+  {
+    q: "What happens right after I pay?",
+    a: "You're redirected straight to a confirmation page that verifies your payment and gives you an immediate PDF download link. If you ever lose that link, just reach out and we'll help you recover it.",
   },
 ];
 

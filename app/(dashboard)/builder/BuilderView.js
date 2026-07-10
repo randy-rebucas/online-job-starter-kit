@@ -801,11 +801,15 @@ const proposalDefaults = () => ({
 });
 
 function ProposalBuilder({ templates }) {
-  const platforms = Object.keys(templates);
+  const platforms = Object.keys(templates || {});
   const [platform, setPlatform] = useState(platforms[0]);
   const [version, setVersion] = useState("short");
   const [v, setV] = useState(proposalDefaults);
   const set = (k) => (val) => setV((p) => ({ ...p, [k]: val }));
+
+  if (!platforms.length) {
+    return <div className="empty-state">Proposal templates aren&apos;t available right now.</div>;
+  }
 
   const map = {
     name: v.name || "[Your Name]",
@@ -824,7 +828,8 @@ function ProposalBuilder({ templates }) {
     timeframe: v.timeframe || "[timeframe]",
     action: v.result || "[specific action taken]",
   };
-  const template = templates[platform][version];
+  const activePlatform = platform && templates[platform] ? platform : platforms[0];
+  const template = templates[activePlatform][version] || Object.values(templates[activePlatform])[0] || "";
   const preview = template.replace(/\{(\w+)\}/g, (m, key) => map[key] ?? m);
 
   function loadProposal(data) {

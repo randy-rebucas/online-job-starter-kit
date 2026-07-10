@@ -6,7 +6,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useProgress } from "./ProgressContext";
 
 const NAV_ITEMS = [
-  { href: "/", icon: "🏠", label: "Home" },
+  { href: "/dashboard", icon: "🏠", label: "Home" },
   { href: "/guide", icon: "📖", label: "Guide" },
   { href: "/roadmap", icon: "🗓️", label: "30-Day Roadmap" },
   { href: "/challenge", icon: "🏆", label: "90-Day Challenge" },

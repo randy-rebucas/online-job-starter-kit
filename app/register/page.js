@@ -35,7 +35,7 @@ export default function RegisterPage() {
       if (signInRes?.error) {
         router.push("/login");
       } else {
-        router.push("/");
+        router.push("/dashboard");
         router.refresh();
       }
     } catch {

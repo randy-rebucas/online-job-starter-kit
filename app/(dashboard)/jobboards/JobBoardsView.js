@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import { inputClass } from "@/components/formStyles";
 
 function difficultyBadge(d) {
@@ -88,7 +89,7 @@ export default function JobBoardsView({ jobBoards }) {
         </div>
       </div>
       <div className="callout">
-        ⚠️ <strong>Scam red flags:</strong> upfront payment requests, unusually high pay for little work, chat-only
+        <AlertTriangle size={15} /> <strong>Scam red flags:</strong> upfront payment requests, unusually high pay for little work, chat-only
         communication off-platform, requests for bank login details, poor grammar with urgent pressure tactics.
       </div>
     </>

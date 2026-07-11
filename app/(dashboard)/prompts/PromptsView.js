@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Bot, Lightbulb } from "lucide-react";
 import CopyButton from "@/components/CopyButton";
 import { inputClass } from "@/components/formStyles";
 
@@ -19,7 +20,9 @@ export default function PromptsView({ prompts, categories }) {
 
   return (
     <>
-      <h1 className="page-title">🤖 AI Prompt Pack</h1>
+      <h1 className="page-title">
+        <Bot size={22} /> AI Prompt Pack
+      </h1>
       <p className="page-sub">
         {prompts.length} ready-to-use prompts across {categories.length} categories. Replace [brackets] with your
         real details.
@@ -62,7 +65,9 @@ export default function PromptsView({ prompts, categories }) {
             <div className="meta-row">
               <strong>Expected output:</strong> {p[3]}
             </div>
-            <div className="tip">💡 {p[4]}</div>
+            <div className="tip">
+              <Lightbulb size={14} /> {p[4]}
+            </div>
           </div>
         ))
       )}

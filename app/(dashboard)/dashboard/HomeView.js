@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Rocket, Calendar, FileText, Bot, BookOpen, Hand } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
 
 export default function HomeView({ chapters, promptCount, jobBoardCount }) {
@@ -24,7 +25,9 @@ export default function HomeView({ chapters, promptCount, jobBoardCount }) {
 
   return (
     <>
-      <h1 className="page-title">Welcome back 👋</h1>
+      <h1 className="page-title">
+        Welcome back <Hand size={22} style={{ verticalAlign: "middle" }} />
+      </h1>
       <p className="page-sub">Your Complete Roadmap from Zero Experience to a Thriving Remote Career</p>
 
       <div className="quote-hero">
@@ -60,29 +63,39 @@ export default function HomeView({ chapters, promptCount, jobBoardCount }) {
         </div>
       </div>
 
-      <div className="section-title">🚀 Quick Actions</div>
+      <div className="section-title">
+        <Rocket size={18} /> Quick Actions
+      </div>
       <div className="grid cols-3">
         <Link href="/roadmap" className="card">
-          <strong>🗓️ Continue Roadmap</strong>
+          <strong>
+            <Calendar size={16} /> Continue Roadmap
+          </strong>
           <p style={{ color: "var(--text-dim)", fontSize: 13 }}>
             Pick up where you left off in the 30-day plan.
           </p>
         </Link>
         <Link href="/builder" className="card">
-          <strong>📝 Build a Document</strong>
+          <strong>
+            <FileText size={16} /> Build a Document
+          </strong>
           <p style={{ color: "var(--text-dim)", fontSize: 13 }}>
             Generate a resume, cover letter, or proposal.
           </p>
         </Link>
         <Link href="/prompts" className="card">
-          <strong>🤖 Browse AI Prompts</strong>
+          <strong>
+            <Bot size={16} /> Browse AI Prompts
+          </strong>
           <p style={{ color: "var(--text-dim)", fontSize: 13 }}>
             200+ ready-to-use prompts across 28 categories.
           </p>
         </Link>
       </div>
 
-      <div className="section-title">📚 Chapter Overview</div>
+      <div className="section-title">
+        <BookOpen size={18} /> Chapter Overview
+      </div>
       <div className="grid cols-2">
         {chapters.map((ch) => {
           const done = ch.checklist.filter((_, i) => state.chapterChecks[`${ch.id}-${i}`]).length;

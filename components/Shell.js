@@ -4,21 +4,40 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+import {
+  Home,
+  BookOpen,
+  Calendar,
+  Trophy,
+  Bot,
+  FileText,
+  Globe,
+  Mic,
+  Wrench,
+  DollarSign,
+  BarChart3,
+  User,
+  BookMarked,
+  SunMoon,
+  LogOut,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { useProgress } from "./ProgressContext";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", icon: "🏠", label: "Home" },
-  { href: "/guide", icon: "📖", label: "Guide" },
-  { href: "/roadmap", icon: "🗓️", label: "30-Day Roadmap" },
-  { href: "/challenge", icon: "🏆", label: "90-Day Challenge" },
-  { href: "/prompts", icon: "🤖", label: "AI Prompt Pack" },
-  { href: "/builder", icon: "📝", label: "Document Builder" },
-  { href: "/jobboards", icon: "🌐", label: "Job Boards" },
-  { href: "/interview", icon: "🎤", label: "Interview Prep" },
-  { href: "/tools", icon: "🧰", label: "AI Tools Cheat Sheet" },
-  { href: "/salary", icon: "💵", label: "Salary Guide" },
-  { href: "/trackers", icon: "📊", label: "Trackers" },
-  { href: "/profile", icon: "👤", label: "Profile" },
+  { href: "/dashboard", icon: Home, label: "Home" },
+  { href: "/guide", icon: BookOpen, label: "Guide" },
+  { href: "/roadmap", icon: Calendar, label: "30-Day Roadmap" },
+  { href: "/challenge", icon: Trophy, label: "90-Day Challenge" },
+  { href: "/prompts", icon: Bot, label: "AI Prompt Pack" },
+  { href: "/builder", icon: FileText, label: "Document Builder" },
+  { href: "/jobboards", icon: Globe, label: "Job Boards" },
+  { href: "/interview", icon: Mic, label: "Interview Prep" },
+  { href: "/tools", icon: Wrench, label: "AI Tools Cheat Sheet" },
+  { href: "/salary", icon: DollarSign, label: "Salary Guide" },
+  { href: "/trackers", icon: BarChart3, label: "Trackers" },
+  { href: "/profile", icon: User, label: "Profile" },
 ];
 
 export default function Shell({ children }) {
@@ -49,7 +68,7 @@ export default function Shell({ children }) {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark">📘</span>
+          <span className="brand-mark"><BookMarked size={20} /></span>
           <div>
             <div className="brand-title">Online Job Starter Kit</div>
             <div className="brand-sub">Your remote career command center</div>
@@ -57,24 +76,24 @@ export default function Shell({ children }) {
         </div>
         <div className="topbar-actions">
           <button className="btn ghost" title="Toggle theme" onClick={toggleTheme}>
-            🌓
+            <SunMoon size={18} />
           </button>
           {session?.user && (
             <div className="user-menu" ref={menuRef}>
               <button className="user-menu-trigger" onClick={() => setMenuOpen((v) => !v)}>
                 <span className="topbar-user">{session.user.name}</span>
-                <span aria-hidden="true">{menuOpen ? "▲" : "▼"}</span>
+                <span aria-hidden="true">{menuOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</span>
               </button>
               {menuOpen && (
                 <div className="user-menu-dropdown">
                   <Link href="/profile" className="user-menu-item" onClick={() => setMenuOpen(false)}>
-                    👤 Profile
+                    <User size={16} /> Profile
                   </Link>
                   <button
                     className="user-menu-item"
                     onClick={() => signOut({ callbackUrl: "/login" })}
                   >
-                    🚪 Sign out
+                    <LogOut size={16} /> Sign out
                   </button>
                 </div>
               )}
@@ -85,15 +104,18 @@ export default function Shell({ children }) {
 
       <div className="body">
         <nav className="sidebar">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`nav-item${pathname === item.href ? " active" : ""}`}
-            >
-              {item.icon} <span>{item.label}</span>
-            </Link>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`nav-item${pathname === item.href ? " active" : ""}`}
+              >
+                <Icon size={18} /> <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
         <main className="content">{children}</main>
       </div>

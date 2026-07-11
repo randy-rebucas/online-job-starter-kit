@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { Search } from "lucide-react";
 import Modal from "@/components/Modal";
 
 export default function ImagePreview({ src, alt, width, height, sizes, imgStyle, title }) {
@@ -24,7 +25,7 @@ export default function ImagePreview({ src, alt, width, height, sizes, imgStyle,
       >
         <Image src={src} alt={alt} width={width} height={height} sizes={sizes} style={imgStyle} />
         <span className="image-preview-zoom" aria-hidden="true">
-          🔍
+          <Search size={16} />
         </span>
       </div>
 

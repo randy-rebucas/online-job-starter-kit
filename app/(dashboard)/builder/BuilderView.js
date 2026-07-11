@@ -1,6 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useId, useState } from "react";
+import {
+  Download,
+  Search,
+  Save,
+  X,
+  ArrowUp,
+  ArrowDown,
+  FileText,
+  Mail,
+  FileStack,
+  Link as LinkIcon,
+  Send,
+  RefreshCw,
+  Edit3,
+} from "lucide-react";
 import CopyButton from "@/components/CopyButton";
 import Modal from "@/components/Modal";
 import { inputClass, textareaClass, selectClass } from "@/components/formStyles";
@@ -156,7 +171,13 @@ function ResumePdfButton({ v, className = "btn small subtle copy-btn" }) {
 
   return (
     <button className={className} onClick={handleClick} disabled={generating} title="Download as a PDF resume">
-      {generating ? "Generating…" : "⬇️ Download PDF"}
+      {generating ? (
+        "Generating…"
+      ) : (
+        <>
+          <Download size={16} /> Download PDF
+        </>
+      )}
     </button>
   );
 }
@@ -213,7 +234,7 @@ function Layout({ form, preview, previewNode, savedDocsPanel, title = "Document 
                   onClick={() => setModalOpen(true)}
                   title="Open a clean, full-size preview"
                 >
-                  🔍 Preview
+                  <Search size={15} /> Preview
                 </button>
                 {downloadButton}
               </>
@@ -447,7 +468,7 @@ function SavedDocsPanel({ type, getSnapshot, onLoad }) {
   return (
     <div className="card">
       <div className="section-title" style={{ marginTop: 0 }}>
-        💾 Saved Versions
+        <Save size={16} /> Saved Versions
       </div>
       {error && <div className="auth-error">{error}</div>}
       <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
@@ -484,7 +505,7 @@ function SavedDocsPanel({ type, getSnapshot, onLoad }) {
                 Load
               </button>
               <button className="btn small danger" disabled={busy} onClick={() => handleDelete(d.id)}>
-                ✕
+                <X size={14} />
               </button>
             </div>
           </div>
@@ -638,7 +659,7 @@ function ResumeBuilder() {
                     onClick={() => moveExperience(i, -1)}
                     aria-label="Move entry up"
                   >
-                    ↑
+                    <ArrowUp size={14} />
                   </button>
                   <button
                     className="btn small subtle"
@@ -646,14 +667,14 @@ function ResumeBuilder() {
                     onClick={() => moveExperience(i, 1)}
                     aria-label="Move entry down"
                   >
-                    ↓
+                    <ArrowDown size={14} />
                   </button>
                   <button
                     className="btn small danger"
                     onClick={() => removeExperience(i)}
                     aria-label="Remove entry"
                   >
-                    ✕
+                    <X size={14} />
                   </button>
                 </div>
               </div>
@@ -1176,12 +1197,12 @@ function FollowUpBuilder() {
 }
 
 const TABS = [
-  { id: "resume", label: "📄 Resume" },
-  { id: "cover", label: "✉️ Cover Letter" },
-  { id: "proposal", label: "📑 Proposal" },
-  { id: "linkedin", label: "🔗 LinkedIn About" },
-  { id: "coldemail", label: "📨 Cold Outreach" },
-  { id: "followup", label: "🔁 Follow-up" },
+  { id: "resume", label: "Resume", icon: FileText },
+  { id: "cover", label: "Cover Letter", icon: Mail },
+  { id: "proposal", label: "Proposal", icon: FileStack },
+  { id: "linkedin", label: "LinkedIn About", icon: LinkIcon },
+  { id: "coldemail", label: "Cold Outreach", icon: Send },
+  { id: "followup", label: "Follow-up", icon: RefreshCw },
 ];
 
 export default function BuilderView({ proposalTemplates }) {
@@ -1189,17 +1210,22 @@ export default function BuilderView({ proposalTemplates }) {
 
   return (
     <>
-      <h1 className="page-title">📝 Document Builder</h1>
+      <h1 className="page-title">
+        <Edit3 size={22} /> Document Builder
+      </h1>
       <p className="page-sub">
         Fill in your details to generate a ready-to-use resume, cover letter, proposal, LinkedIn About section, cold
         outreach email, or follow-up email — then save multiple versions per document type.
       </p>
       <div className="tabs">
-        {TABS.map((t) => (
-          <button key={t.id} className={`tab-btn${tab === t.id ? " active" : ""}`} onClick={() => setTab(t.id)}>
-            {t.label}
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const Icon = t.icon;
+          return (
+            <button key={t.id} className={`tab-btn${tab === t.id ? " active" : ""}`} onClick={() => setTab(t.id)}>
+              <Icon size={15} /> {t.label}
+            </button>
+          );
+        })}
       </div>
       {tab === "resume" && <ResumeBuilder key="resume" />}
       {tab === "cover" && <CoverBuilder key="cover" />}

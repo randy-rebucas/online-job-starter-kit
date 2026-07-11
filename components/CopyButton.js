@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check, Copy } from "lucide-react";
 
 export default function CopyButton({ text, className = "btn small subtle copy-btn" }) {
   const [copied, setCopied] = useState(false);
@@ -14,7 +15,15 @@ export default function CopyButton({ text, className = "btn small subtle copy-bt
 
   return (
     <button className={className} onClick={handleCopy}>
-      {copied ? "✅ Copied" : "📋 Copy"}
+      {copied ? (
+        <>
+          <Check size={14} /> Copied
+        </>
+      ) : (
+        <>
+          <Copy size={14} /> Copy
+        </>
+      )}
     </button>
   );
 }

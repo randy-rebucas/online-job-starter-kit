@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Download } from "lucide-react";
 import { inputClass } from "@/components/formStyles";
 
 export default function BuyKitButton({ priceLabel, defaultEmail = "" }) {
@@ -74,7 +75,13 @@ export default function BuyKitButton({ priceLabel, defaultEmail = "" }) {
         />
       )}
       <button type="submit" className="btn primary" disabled={loading}>
-        {loading ? "Redirecting to payment…" : `⬇️ Buy the Starter Kit — ${priceLabel}`}
+        {loading ? (
+          "Redirecting to payment…"
+        ) : (
+          <>
+            <Download size={16} /> Buy the Starter Kit — {priceLabel}
+          </>
+        )}
       </button>
       <span style={{ fontSize: 11.5, color: "var(--text-dim)" }}>Secure checkout via PayMongo — card, GCash, or Maya.</span>
     </form>

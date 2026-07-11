@@ -2,20 +2,43 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { BookOpen, Bot, CheckCircle2, XCircle } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
 import CopyButton from "@/components/CopyButton";
 
-function renderBody(body) {
-  const escaped = body
+function escapeHtml(text) {
+  return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-  const html = escaped
-    .replace(/\n\n/g, "<br><br>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/❌ (.+)/g, '<span style="color:#e5484d;">❌ $1</span>')
-    .replace(/✅ (.+)/g, '<span style="color:var(--emerald);">✅ $1</span>');
-  return { __html: html };
+}
+
+function markupToHtml(text) {
+  return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
+
+function renderBody(body) {
+  return body.split("\n\n").map((paragraph, i) => {
+    const badMatch = paragraph.match(/^❌ (.+)/);
+    const goodMatch = paragraph.match(/^✅ (.+)/);
+    if (badMatch) {
+      return (
+        <p key={i} style={{ color: "#e5484d", display: "flex", gap: 6, alignItems: "flex-start" }}>
+          <XCircle size={16} style={{ flexShrink: 0, marginTop: 3 }} />
+          <span dangerouslySetInnerHTML={{ __html: markupToHtml(badMatch[1]) }} />
+        </p>
+      );
+    }
+    if (goodMatch) {
+      return (
+        <p key={i} style={{ color: "var(--emerald)", display: "flex", gap: 6, alignItems: "flex-start" }}>
+          <CheckCircle2 size={16} style={{ flexShrink: 0, marginTop: 3 }} />
+          <span dangerouslySetInnerHTML={{ __html: markupToHtml(goodMatch[1]) }} />
+        </p>
+      );
+    }
+    return <p key={i} dangerouslySetInnerHTML={{ __html: markupToHtml(paragraph) }} />;
+  });
 }
 
 export default function GuideView({ chapters }) {
@@ -42,7 +65,9 @@ export default function GuideView({ chapters }) {
 
   return (
     <>
-      <h1 className="page-title">📖 Guide</h1>
+      <h1 className="page-title">
+        <BookOpen size={22} /> Guide
+      </h1>
       <p className="page-sub">The full Online Job Starter Kit, chapter by chapter.</p>
       <div className="grid" style={{ gridTemplateColumns: "240px 1fr", alignItems: "start" }}>
         <div className="card" style={{ padding: 10 }}>
@@ -67,9 +92,9 @@ export default function GuideView({ chapters }) {
             <h2 style={{ marginTop: 0 }}>
               Chapter {ch.id}: {ch.title}
             </h2>
-            <div style={{ fontSize: 14, lineHeight: 1.7 }} dangerouslySetInnerHTML={renderBody(ch.body)} />
+            <div style={{ fontSize: 14, lineHeight: 1.7 }}>{renderBody(ch.body)}</div>
             <div className="callout">
-              🤖 <strong>AI Prompt:</strong> &quot;{ch.aiPrompt}&quot;
+              <Bot size={15} /> <strong>AI Prompt:</strong> &quot;{ch.aiPrompt}&quot;
               <div style={{ marginTop: 8 }}>
                 <CopyButton text={ch.aiPrompt} />
               </div>
@@ -77,7 +102,7 @@ export default function GuideView({ chapters }) {
           </div>
           <div className="card">
             <div className="section-title" style={{ marginTop: 0 }}>
-              ✅ Chapter Checklist
+              <CheckCircle2 size={18} /> Chapter Checklist
             </div>
             {ch.checklist.map((item, i) => {
               const key = `${ch.id}-${i}`;

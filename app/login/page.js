@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { BookMarked } from "lucide-react";
 import { inputClass } from "@/components/formStyles";
 
 export default function LoginPage() {
@@ -30,7 +31,7 @@ export default function LoginPage() {
   return (
     <div className="auth-wrap">
       <div className="card auth-card">
-        <div className="auth-title">📘 Welcome back</div>
+        <div className="auth-title"><BookMarked size={20} /> Welcome back</div>
         <p className="auth-sub">Sign in to your Online Job Starter Kit dashboard.</p>
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>

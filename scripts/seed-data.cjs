@@ -862,11 +862,11 @@ const PROPOSAL_TEMPLATES = {
 
 /* ---------------- Worksheets/Trackers config ---------------- */
 const TRACKERS = [
-  { id:"jobApp", title:"📄 Job Application Tracker", cols:["Date","Company/Client","Role","Platform","Status","Follow-up Date","Notes"] },
-  { id:"interviewTracker", title:"🎤 Interview Tracker", cols:["Date","Company/Client","Role","Interview Stage","Outcome","Key Notes/Learnings"] },
-  { id:"learningTracker", title:"📚 Learning Tracker", cols:["Skill","Resource","Start Date","Target Completion","Progress (%)","Notes"] },
-  { id:"incomeTracker", title:"💰 Income Tracker", cols:["Month","Client","Amount Earned","Payment Method","Notes"] },
-  { id:"clientTracker", title:"🤝 Client Tracker", cols:["Client Name","Contact Info","Project/Service","Rate","Status","Payment Terms","Notes"] }
+  { id:"jobApp", title:"Job Application Tracker", cols:["Date","Company/Client","Role","Platform","Status","Follow-up Date","Notes"] },
+  { id:"interviewTracker", title:"Interview Tracker", cols:["Date","Company/Client","Role","Interview Stage","Outcome","Key Notes/Learnings"] },
+  { id:"learningTracker", title:"Learning Tracker", cols:["Skill","Resource","Start Date","Target Completion","Progress (%)","Notes"] },
+  { id:"incomeTracker", title:"Income Tracker", cols:["Month","Client","Amount Earned","Payment Method","Notes"] },
+  { id:"clientTracker", title:"Client Tracker", cols:["Client Name","Contact Info","Project/Service","Rate","Status","Payment Terms","Notes"] }
 ];
 const HABIT_TRACKER_ROWS = ["Applied to 1+ job/pitch","20-min LinkedIn routine","Learned/practiced a skill","Reviewed tracker sheets","No-phone deep work block"];
 const HABIT_TRACKER_DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import { inputClass } from "@/components/formStyles";
 
 function timeAgo(iso) {
@@ -36,7 +37,17 @@ export default function LiveJobsView({ jobs, sourceStatus, fetchedAt }) {
     <>
       <div className="flex-between">
         <div className="section-title" style={{ marginTop: 0 }}>
-          🔴 Live Job Postings
+          <span
+            aria-hidden="true"
+            style={{
+              display: "inline-block",
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: "var(--red, #e5484d)",
+            }}
+          />{" "}
+          Live Job Postings
         </div>
         {fetchedAt && (
           <span style={{ fontSize: 12, color: "var(--text-dim)" }}>
@@ -52,7 +63,7 @@ export default function LiveJobsView({ jobs, sourceStatus, fetchedAt }) {
 
       {failedSources.length > 0 && (
         <div className="callout">
-          ⚠️ Couldn&apos;t reach {failedSources.map(([name]) => name).join(", ")} right now — showing results from the
+          <AlertTriangle size={15} /> Couldn&apos;t reach {failedSources.map(([name]) => name).join(", ")} right now — showing results from the
           other sources.
         </div>
       )}

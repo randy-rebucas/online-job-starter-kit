@@ -1,5 +1,6 @@
 "use client";
 
+import { Calendar } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
 
 export default function RoadmapView({ roadmap }) {
@@ -15,7 +16,9 @@ export default function RoadmapView({ roadmap }) {
 
   return (
     <>
-      <h1 className="page-title">🗓️ 30-Day Roadmap</h1>
+      <h1 className="page-title">
+        <Calendar size={22} /> 30-Day Roadmap
+      </h1>
       <p className="page-sub">
         Turn the whole kit into a daily action plan. Shift days forward if you fall behind — don&apos;t cram.
       </p>

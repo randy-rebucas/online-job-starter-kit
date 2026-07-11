@@ -1,3 +1,4 @@
+import { DollarSign, Calculator, AlertTriangle } from "lucide-react";
 import { getAllContent } from "@/lib/content";
 
 export default async function SalaryPage() {
@@ -7,7 +8,9 @@ export default async function SalaryPage() {
 
   return (
     <>
-      <h1 className="page-title">💵 Salary Guide</h1>
+      <h1 className="page-title">
+        <DollarSign size={22} /> Salary Guide
+      </h1>
       <p className="page-sub">
         General USD/hour estimates for international clients — a starting reference, not a guarantee.
       </p>
@@ -71,7 +74,7 @@ export default async function SalaryPage() {
       </div>
       <div className="card">
         <div className="section-title" style={{ marginTop: 0 }}>
-          🧮 How to Set Your Own Rate
+          <Calculator size={18} /> How to Set Your Own Rate
         </div>
         <ol style={{ fontSize: 13.5, lineHeight: 1.8 }}>
           <li>Research market rate for your role/niche using this table and real job posts.</li>
@@ -81,7 +84,7 @@ export default async function SalaryPage() {
           <li>Charge more for specialized skill combinations.</li>
         </ol>
         <div className="callout">
-          ⚠️ Common mistakes: underpricing to &quot;win&quot; a client, never raising rates with existing clients,
+          <AlertTriangle size={15} /> Common mistakes: underpricing to &quot;win&quot; a client, never raising rates with existing clients,
           ignoring non-billable time, comparing rates without adjusting for niche/region/experience.
         </div>
       </div>

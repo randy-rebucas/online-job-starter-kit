@@ -1,5 +1,6 @@
 "use client";
 
+import { Trophy, Calendar, Gift, Sparkles } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
 
 export default function ChallengeView({ daily, months, finalQuestions }) {
@@ -17,12 +18,14 @@ export default function ChallengeView({ daily, months, finalQuestions }) {
 
   return (
     <>
-      <h1 className="page-title">🏆 90-Day Career Success Challenge</h1>
+      <h1 className="page-title">
+        <Trophy size={22} /> 90-Day Career Success Challenge
+      </h1>
       <p className="page-sub">From &quot;landed a job&quot; to confident, growing professional.</p>
 
       <div className="card">
         <div className="section-title" style={{ marginTop: 0 }}>
-          🗓️ Daily Missions
+          <Calendar size={18} /> Daily Missions
         </div>
         {daily.map((item, i) => {
           const key = `daily-${i}`;
@@ -74,14 +77,14 @@ export default function ChallengeView({ daily, months, finalQuestions }) {
             ))}
           </ul>
           <div className="callout">
-            🎁 <strong>Reward:</strong> {m.reward}
+            <Gift size={15} /> <strong>Reward:</strong> {m.reward}
           </div>
         </div>
       ))}
 
       <div className="card">
         <div className="section-title" style={{ marginTop: 0 }}>
-          🪞 Final Reflection Questions
+          <Sparkles size={18} /> Final Reflection Questions
         </div>
         <ul style={{ fontSize: 13.5, lineHeight: 1.8 }}>
           {finalQuestions.map((q) => (

@@ -1,4 +1,18 @@
 import Link from "next/link";
+import {
+  BookOpen,
+  Calendar,
+  Bot,
+  FileText,
+  Globe,
+  BarChart3,
+  BookMarked,
+  Rocket,
+  Zap,
+  Package,
+  Wrench,
+  HelpCircle,
+} from "lucide-react";
 import { auth } from "@/auth";
 import BuyKitButton from "./BuyKitButton";
 import ImagePreview from "@/components/ImagePreview";
@@ -17,12 +31,12 @@ const DOWNLOAD_HIGHLIGHTS = [
 ];
 
 const FEATURES = [
-  { icon: "📖", title: "Guide", desc: "8 in-depth chapters covering resumes, portfolios, and landing your first client." },
-  { icon: "🗓️", title: "30-Day Roadmap", desc: "A day-by-day action plan from zero experience to your first paid gig." },
-  { icon: "🤖", title: "AI Prompt Pack", desc: "200+ ready-to-use prompts across 28 categories, searchable and copy-ready." },
-  { icon: "📝", title: "Document Builder", desc: "Generate a resume, cover letter, proposal, and more — save multiple versions, export to PDF." },
-  { icon: "🌐", title: "Live Job Boards", desc: "Real, current postings pulled from public job APIs, plus a directory of 50+ platforms." },
-  { icon: "📊", title: "Trackers & Analytics", desc: "Track applications, interviews, and income — with an outcomes breakdown, not just spreadsheets." },
+  { icon: BookOpen, title: "Guide", desc: "8 in-depth chapters covering resumes, portfolios, and landing your first client." },
+  { icon: Calendar, title: "30-Day Roadmap", desc: "A day-by-day action plan from zero experience to your first paid gig." },
+  { icon: Bot, title: "AI Prompt Pack", desc: "200+ ready-to-use prompts across 28 categories, searchable and copy-ready." },
+  { icon: FileText, title: "Document Builder", desc: "Generate a resume, cover letter, proposal, and more — save multiple versions, export to PDF." },
+  { icon: Globe, title: "Live Job Boards", desc: "Real, current postings pulled from public job APIs, plus a directory of 50+ platforms." },
+  { icon: BarChart3, title: "Trackers & Analytics", desc: "Track applications, interviews, and income — with an outcomes breakdown, not just spreadsheets." },
 ];
 
 const STEPS = [
@@ -81,7 +95,7 @@ export default async function LandingPage() {
     <div className="landing">
       <header className="landing-topbar">
         <div className="brand">
-          <span className="brand-mark">📘</span>
+          <span className="brand-mark"><BookMarked size={20} /></span>
           <div>
             <div className="brand-title">Online Job Starter Kit</div>
             <div className="brand-sub">Your remote career command center</div>
@@ -104,7 +118,7 @@ export default async function LandingPage() {
       </header>
 
       <section className="landing-hero">
-        <span className="landing-eyebrow">🚀 Free to start — no credit card</span>
+        <span className="landing-eyebrow"><Rocket size={16} /> Free to start — no credit card</span>
         <h1>From zero experience to a thriving remote career.</h1>
         <p>
           Everything you need in one place: a step-by-step roadmap, an AI prompt library, a document builder that
@@ -135,7 +149,7 @@ export default async function LandingPage() {
         <Reveal>
           <div className="landing-section-head">
             <h2 className="section-title" style={{ marginTop: 0, justifyContent: "center" }}>
-              ⚡ How It Works
+              <Zap size={20} /> How It Works
             </h2>
             <p>Three steps from signing up to landing your first client.</p>
           </div>
@@ -158,7 +172,7 @@ export default async function LandingPage() {
           <div className="grid cols-2 landing-download-grid">
             <div>
               <div className="section-title" style={{ marginTop: 0 }}>
-                📦 Get the Complete Starter Kit
+                <Package size={18} /> Get the Complete Starter Kit
               </div>
               <h2 className="landing-download-title">Everything in one download.</h2>
               <p style={{ color: "var(--text-dim)", fontSize: 14.5, lineHeight: 1.6, marginBottom: 18 }}>
@@ -193,28 +207,33 @@ export default async function LandingPage() {
         <Reveal>
           <div className="landing-section-head">
             <h2 className="section-title" style={{ marginTop: 0, justifyContent: "center" }}>
-              🧰 Everything You Need
+              <Wrench size={20} /> Everything You Need
             </h2>
             <p>One account, six tools — no juggling spreadsheets, docs, and a dozen tabs.</p>
           </div>
         </Reveal>
         <div className="grid cols-3">
-          {FEATURES.map((f, i) => (
-            <Reveal key={f.title} delay={i * 90}>
-              <div className="card">
-                <div style={{ fontSize: 26, marginBottom: 8 }}>{f.icon}</div>
-                <strong>{f.title}</strong>
-                <p style={{ color: "var(--text-dim)", fontSize: 13.5, marginTop: 6 }}>{f.desc}</p>
-              </div>
-            </Reveal>
-          ))}
+          {FEATURES.map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <Reveal key={f.title} delay={i * 90}>
+                <div className="card">
+                  <div style={{ marginBottom: 8 }}>
+                    <Icon size={26} />
+                  </div>
+                  <strong>{f.title}</strong>
+                  <p style={{ color: "var(--text-dim)", fontSize: 13.5, marginTop: 6 }}>{f.desc}</p>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </section>
 
       <section className="landing-faq">
         <Reveal>
           <h2 className="section-title" style={{ marginTop: 0 }}>
-            ❓ Frequently Asked Questions
+            <HelpCircle size={20} /> Frequently Asked Questions
           </h2>
         </Reveal>
         {FAQS.map((item, i) => (
@@ -238,7 +257,9 @@ export default async function LandingPage() {
 
       <Reveal>
         <div className="landing-bottombar">
-          <span>📘 Online Job Starter Kit</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <BookMarked size={16} /> Online Job Starter Kit
+          </span>
           <span>&copy; {new Date().getFullYear()}. Built for people starting from zero.</span>
         </div>
       </Reveal>

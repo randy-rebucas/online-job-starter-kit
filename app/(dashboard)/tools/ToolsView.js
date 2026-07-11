@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Wrench } from "lucide-react";
 import { inputClass } from "@/components/formStyles";
 
 function yesNoBadge(v) {
@@ -24,7 +25,9 @@ export default function ToolsView({ tools }) {
 
   return (
     <>
-      <h1 className="page-title">🧰 AI Tools Cheat Sheet</h1>
+      <h1 className="page-title">
+        <Wrench size={22} /> AI Tools Cheat Sheet
+      </h1>
       <p className="page-sub">{tools.length}+ tools. Pick 1-2 per category and master them before adding more.</p>
       <div className="field">
         <input

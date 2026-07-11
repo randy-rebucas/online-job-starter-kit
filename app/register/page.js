@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { BookMarked } from "lucide-react";
 import { inputClass, selectClass } from "@/components/formStyles";
 import { CURRENT_STATUS_OPTIONS } from "@/lib/currentStatus";
 
@@ -51,7 +52,7 @@ export default function RegisterPage() {
   return (
     <div className="auth-wrap">
       <div className="card auth-card">
-        <div className="auth-title">📘 Create your account</div>
+        <div className="auth-title"><BookMarked size={20} /> Create your account</div>
         <p className="auth-sub">Start your remote career journey.</p>
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Mic, Star, BarChart3 } from "lucide-react";
 import { inputClass } from "@/components/formStyles";
 
 export default function InterviewView({ questions }) {
@@ -19,7 +20,9 @@ export default function InterviewView({ questions }) {
 
   return (
     <>
-      <h1 className="page-title">🎤 Interview Prep</h1>
+      <h1 className="page-title">
+        <Mic size={22} /> Interview Prep
+      </h1>
       <p className="page-sub">
         {questions.length} questions across {cats.length - 1} categories.
       </p>
@@ -63,13 +66,15 @@ export default function InterviewView({ questions }) {
       )}
       <div className="card">
         <div className="section-title" style={{ marginTop: 0 }}>
-          🌟 What Interviewers Want
+          <Star size={18} /> What Interviewers Want
         </div>
         <p style={{ fontSize: 13.5 }}>
           Specificity · Ownership (&quot;I did,&quot; not &quot;we did&quot;) · Self-awareness · Alignment to the
           role · Calm confidence.
         </p>
-        <div className="section-title">📊 Self-Scoring Rubric</div>
+        <div className="section-title">
+          <BarChart3 size={18} /> Self-Scoring Rubric
+        </div>
         <table>
           <tbody>
             <tr>

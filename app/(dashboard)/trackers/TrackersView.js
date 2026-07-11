@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TrendingUp, Download, X, RefreshCw, BarChart3, Plus } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
 
 function makeId() {
@@ -72,7 +73,7 @@ function ApplicationAnalytics({ rows, statusColIndex }) {
   return (
     <div className="card">
       <div className="section-title" style={{ marginTop: 0 }}>
-        📈 Application Outcomes
+        <TrendingUp size={18} /> Application Outcomes
       </div>
       <div className="grid cols-3">
         <div className="card stat">
@@ -114,6 +115,7 @@ function ApplicationAnalytics({ rows, statusColIndex }) {
 }
 
 function EditableTracker({ tracker }) {
+  console.log("EditableTracker render", tracker.length);
   const { state, patch } = useProgress();
   const savedRows = state.trackers[tracker.id] || [emptyRow(tracker.cols.length)];
   const rows = savedRows.map((row) => normalizeRow(row, tracker.cols.length));
@@ -152,6 +154,8 @@ function EditableTracker({ tracker }) {
   }
 
   const statusColIndex = tracker.cols.indexOf("Status");
+  const isEmpty = rows.length === 1 && rows[0].every((c) => !(c || "").trim());
+  const cellPlaceholder = (ri) => (isEmpty && ri === 0 ? "Click to add an entry…" : "");
 
   return (
     <>
@@ -161,10 +165,10 @@ function EditableTracker({ tracker }) {
           <strong>{tracker.title}</strong>
           <div>
             <button className="btn small subtle" onClick={addRow}>
-              + Add Row
+              <Plus size={14} /> Add Row
             </button>
             <button className="btn small subtle" onClick={() => exportCsv(tracker, rows)} style={{ marginLeft: 6 }}>
-              ⬇️ Export CSV
+              <Download size={14} /> Export CSV
             </button>
           </div>
         </div>
@@ -179,27 +183,36 @@ function EditableTracker({ tracker }) {
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, ri) => (
-                <tr key={ids[ri]}>
-                  {row.map((cell, ci) => (
-                    <td
-                      key={ci}
-                      contentEditable
-                      suppressContentEditableWarning
-                      role="textbox"
-                      aria-label={`${tracker.cols[ci]}, row ${ri + 1}`}
-                      onBlur={(e) => editCell(ri, ci, e.target.textContent)}
-                    >
-                      {cell}
+              {rows.map((row, ri) => {
+                return (
+                  <tr key={ids[ri]}>
+                    {row.map((cell, ci) => (
+                      <td
+                        key={ci}
+                        contentEditable
+                        suppressContentEditableWarning
+                        role="textbox"
+                        aria-label={`${tracker.cols[ci]}, row ${ri + 1}`}
+                        data-placeholder={ci === 0 ? cellPlaceholder(ri) : ""}
+                        onBlur={(e) => editCell(ri, ci, e.target.textContent)}
+                      >
+                        {cell}
+                      </td>
+                    ))}
+                    <td>
+                      {!isEmpty && (
+                        <button
+                          className="btn small danger"
+                          onClick={() => deleteRow(ri)}
+                          aria-label={`Delete row ${ri + 1}`}
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
                     </td>
-                  ))}
-                  <td>
-                    <button className="btn small danger" onClick={() => deleteRow(ri)}>
-                      ✕
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -217,7 +230,9 @@ function HabitTracker({ days, habits }) {
 
   return (
     <div className="card">
-      <strong>🔁 Daily Habit Tracker</strong>
+      <strong>
+        <RefreshCw size={16} /> Daily Habit Tracker
+      </strong>
       <div className="table-wrap" style={{ marginTop: 10 }}>
         <table>
           <thead>
@@ -263,7 +278,9 @@ export default function TrackersView({ trackers, habitDays, habitRows }) {
 
   return (
     <>
-      <h1 className="page-title">📊 Trackers &amp; Worksheets</h1>
+      <h1 className="page-title">
+        <BarChart3 size={22} /> Trackers &amp; Worksheets
+      </h1>
       <p className="page-sub">Editable tables — your entries auto-save to your account. Click a cell to edit.</p>
       <div className="tabs">
         {trackers.map((t) => (
@@ -272,7 +289,7 @@ export default function TrackersView({ trackers, habitDays, habitRows }) {
           </button>
         ))}
         <button className={`tab-btn${tab === "habits" ? " active" : ""}`} onClick={() => setTab("habits")}>
-          🔁 Daily Habit Tracker
+          Daily Habit Tracker
         </button>
       </div>
       {tab === "habits" ? (

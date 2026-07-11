@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { CheckCircle, Download } from "lucide-react";
 
 const MAX_POLLS = 6;
 const POLL_INTERVAL_MS = 2500;
@@ -29,12 +30,14 @@ export default function SuccessView({ reference, initialStatus, initialToken, lo
   if (status === "paid" && token) {
     return (
       <div className="card auth-card" style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 40, marginBottom: 8 }}>✅</div>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+          <CheckCircle size={40} />
+        </div>
         <div className="auth-title">Payment confirmed</div>
         <p className="auth-sub">Your download is ready — this link expires in 15 minutes.</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <a href={`/api/download/starter-kit?token=${encodeURIComponent(token)}`} className="btn primary">
-            ⬇️ Download the Starter Kit (PDF)
+            <Download size={16} /> Download the Starter Kit (PDF)
           </a>
           {loggedIn && (
             <a href="/dashboard" className="btn subtle">

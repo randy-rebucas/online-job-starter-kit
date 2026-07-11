@@ -1,3 +1,4 @@
+import { Globe, ClipboardList } from "lucide-react";
 import { getContent } from "@/lib/content";
 import { getLiveJobs } from "@/lib/jobFeeds";
 import LiveJobsView from "./LiveJobsView";
@@ -11,12 +12,16 @@ export default async function JobBoardsPage() {
 
   return (
     <>
-      <h1 className="page-title">🌐 Job Boards</h1>
+      <h1 className="page-title">
+        <Globe size={22} /> Job Boards
+      </h1>
       <p className="page-sub">Live postings pulled from real sources, plus a full directory of platforms to work from.</p>
 
       <LiveJobsView jobs={live.jobs} sourceStatus={live.sourceStatus} fetchedAt={live.fetchedAt} />
 
-      <div className="section-title">📋 Platform Directory</div>
+      <div className="section-title">
+        <ClipboardList size={18} /> Platform Directory
+      </div>
       <JobBoardsView jobBoards={jobBoards} />
     </>
   );

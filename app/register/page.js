@@ -39,7 +39,7 @@ export default function RegisterPage() {
       if (signInRes?.error) {
         router.push("/login");
       } else {
-        router.push("/dashboard");
+        router.push("/billing");
         router.refresh();
       }
     } catch {

@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { dbConnect } from "@/lib/mongodb";
 import User from "@/models/User";
 import BuyKitButton from "@/app/BuyKitButton";
+import SignOutButton from "./SignOutButton";
 
 export default async function BillingPage() {
   const session = await auth();
@@ -24,6 +25,9 @@ export default async function BillingPage() {
           no subscription, pay once, keep access forever.
         </p>
         <BuyKitButton priceLabel={priceLabel} defaultEmail={session.user.email} />
+        <div style={{ marginTop: 16 }}>
+          <SignOutButton />
+        </div>
       </div>
     </div>
   );

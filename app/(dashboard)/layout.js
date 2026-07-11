@@ -11,7 +11,11 @@ export default async function DashboardLayout({ children }) {
 
   await dbConnect();
   const user = await User.findById(session.user.id).select("isPaid").lean();
-  if (!user?.isPaid) redirect("/billing");
+  // A resolved user id with no matching document means the session's JWT is
+  // stale (e.g. account recreated/reseeded) — send back to login for a fresh
+  // token instead of silently treating it as "hasn't paid".
+  if (!user) redirect("/login");
+  if (!user.isPaid) redirect("/billing");
 
   return (
     <ProgressProvider>

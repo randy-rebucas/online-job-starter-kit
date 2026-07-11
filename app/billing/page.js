@@ -10,7 +10,8 @@ export default async function BillingPage() {
 
   await dbConnect();
   const user = await User.findById(session.user.id).select("isPaid").lean();
-  if (user?.isPaid) redirect("/dashboard");
+  if (!user) redirect("/login");
+  if (user.isPaid) redirect("/dashboard");
 
   const priceLabel = `₱${process.env.STARTER_KIT_PRICE_PHP || 499}`;
 

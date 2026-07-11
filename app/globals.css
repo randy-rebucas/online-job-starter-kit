@@ -73,6 +73,49 @@ body {
 .topbar-actions { display: flex; align-items: center; gap: 10px; }
 .topbar-user { font-size: 12.5px; opacity: 0.85; }
 
+.user-menu { position: relative; }
+.user-menu-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.user-menu-trigger:hover { background: rgba(255,255,255,0.16); }
+.user-menu-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  z-index: 30;
+}
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.user-menu-item:hover { background: var(--bg); }
+
 .btn {
   border: none;
   border-radius: 10px;
@@ -371,6 +414,14 @@ input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--coral); 
 .auth-error {
   background: rgba(229,72,77,0.1);
   color: #e5484d;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.auth-success {
+  background: rgba(34,197,94,0.1);
+  color: #22c55e;
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 13px;

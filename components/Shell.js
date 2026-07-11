@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { useEffect, useRef, useState } from "react";
 import { useProgress } from "./ProgressContext";
 
 const NAV_ITEMS = [
@@ -17,12 +18,23 @@ const NAV_ITEMS = [
   { href: "/tools", icon: "🧰", label: "AI Tools Cheat Sheet" },
   { href: "/salary", icon: "💵", label: "Salary Guide" },
   { href: "/trackers", icon: "📊", label: "Trackers" },
+  { href: "/profile", icon: "👤", label: "Profile" },
 ];
 
 export default function Shell({ children }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { state, patch } = useProgress();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function onClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
 
   function toggleTheme() {
     const current =
@@ -44,13 +56,30 @@ export default function Shell({ children }) {
           </div>
         </div>
         <div className="topbar-actions">
-          {session?.user && <span className="topbar-user">{session.user.name}</span>}
           <button className="btn ghost" title="Toggle theme" onClick={toggleTheme}>
             🌓
           </button>
-          <button className="btn ghost" onClick={() => signOut({ callbackUrl: "/login" })}>
-            Sign out
-          </button>
+          {session?.user && (
+            <div className="user-menu" ref={menuRef}>
+              <button className="user-menu-trigger" onClick={() => setMenuOpen((v) => !v)}>
+                <span className="topbar-user">{session.user.name}</span>
+                <span aria-hidden="true">{menuOpen ? "▲" : "▼"}</span>
+              </button>
+              {menuOpen && (
+                <div className="user-menu-dropdown">
+                  <Link href="/profile" className="user-menu-item" onClick={() => setMenuOpen(false)}>
+                    👤 Profile
+                  </Link>
+                  <button
+                    className="user-menu-item"
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                  >
+                    🚪 Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </header>
 

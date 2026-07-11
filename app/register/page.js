@@ -4,13 +4,17 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { inputClass } from "@/components/formStyles";
+import { inputClass, selectClass } from "@/components/formStyles";
+import { CURRENT_STATUS_OPTIONS } from "@/lib/currentStatus";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [facebookProfile, setFacebookProfile] = useState("");
+  const [currentStatus, setCurrentStatus] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +26,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, mobileNumber, facebookProfile, currentStatus }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -93,6 +97,49 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
             />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="register-mobile">Mobile Number</label>
+            <input
+              id="register-mobile"
+              name="mobileNumber"
+              type="tel"
+              autoComplete="tel"
+              required
+              className={inputClass}
+              value={mobileNumber}
+              onChange={(e) => setMobileNumber(e.target.value)}
+              placeholder="09XX XXX XXXX"
+            />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="register-facebook">Facebook Profile</label>
+            <input
+              id="register-facebook"
+              name="facebookProfile"
+              type="text"
+              required
+              className={inputClass}
+              value={facebookProfile}
+              onChange={(e) => setFacebookProfile(e.target.value)}
+              placeholder="https://facebook.com/yourprofile"
+            />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="register-status">Current Status</label>
+            <select
+              id="register-status"
+              name="currentStatus"
+              required
+              className={selectClass}
+              value={currentStatus}
+              onChange={(e) => setCurrentStatus(e.target.value)}
+            >
+              <option value="" disabled>Select your current status</option>
+              {CURRENT_STATUS_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
           </div>
           <button type="submit" className="btn primary" disabled={loading}>
             {loading ? "Creating account..." : "Create account"}

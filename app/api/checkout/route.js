@@ -26,7 +26,10 @@ export async function POST(req) {
   const discountCodeRaw = typeof body?.discountCode === "string" ? body.discountCode.trim() : "";
 
   const baseAmountPhp = Number(process.env.STARTER_KIT_PRICE_PHP || 499);
-  const baseUrl = process.env.NEXTAUTH_URL || new URL(req.url).origin;
+  const baseUrl = process.env.NEXTAUTH_URL;
+  if (!baseUrl) {
+    return NextResponse.json({ error: "Server misconfigured." }, { status: 500 });
+  }
   const reference = crypto.randomUUID();
 
   let amountPhp = baseAmountPhp;
@@ -71,6 +74,7 @@ export async function POST(req) {
   } catch (err) {
     purchase.status = "failed";
     await purchase.save();
-    return NextResponse.json({ error: err.message || "Could not start checkout." }, { status: 502 });
+    console.error("Checkout session creation failed:", err);
+    return NextResponse.json({ error: "Could not start checkout." }, { status: 502 });
   }
 }

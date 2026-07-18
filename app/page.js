@@ -118,7 +118,7 @@ export default async function LandingPage() {
       </header>
 
       <section className="landing-hero">
-        <span className="landing-eyebrow"><Rocket size={16} /> Free to start — no credit card</span>
+        <span className="landing-eyebrow">Free to start — no credit card</span>
         <h1>From zero experience to a thriving remote career.</h1>
         <p>
           Everything you need in one place: a step-by-step roadmap, an AI prompt library, a document builder that

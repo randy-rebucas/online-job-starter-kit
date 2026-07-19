@@ -11,6 +11,7 @@ const DEFAULT_STATE = {
   trackers: {},
   habits: {},
   streaks: { currentStreak: 0, longestStreak: 0, lastActiveDate: null },
+  lastSeenAnnouncementsAt: null,
   theme: null,
 };
 

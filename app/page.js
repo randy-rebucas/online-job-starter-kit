@@ -17,6 +17,7 @@ import { auth } from "@/auth";
 import BuyKitButton from "./BuyKitButton";
 import ImagePreview from "@/components/ImagePreview";
 import Reveal from "@/components/Reveal";
+import ReferralCapture from "@/components/ReferralCapture";
 
 const STARTER_KIT_PRICE_PHP = Number(process.env.STARTER_KIT_PRICE_PHP || 499);
 
@@ -93,6 +94,7 @@ export default async function LandingPage() {
 
   return (
     <div className="landing">
+      <ReferralCapture />
       <header className="landing-topbar">
         <div className="brand">
           <span className="brand-mark"><BookMarked size={20} /></span>

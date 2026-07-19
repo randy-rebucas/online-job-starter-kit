@@ -5,6 +5,7 @@ import User from "@/models/User";
 import UserProgress from "@/models/UserProgress";
 import { reconcileUserPayment } from "@/lib/entitlements";
 import { CURRENT_STATUS_VALUES } from "@/lib/currentStatus";
+import { getOrCreateReferralCode } from "@/lib/referral";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -15,7 +16,7 @@ export async function POST(req) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
-  const { name, email, password, mobileNumber, facebookProfile, currentStatus } = body || {};
+  const { name, email, password, mobileNumber, facebookProfile, currentStatus, referralCode } = body || {};
 
   if (
     typeof name !== "string" ||
@@ -47,6 +48,12 @@ export async function POST(req) {
     return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
   }
 
+  let referredBy = null;
+  if (typeof referralCode === "string" && referralCode.trim()) {
+    const referrer = await User.findOne({ referralCode: referralCode.trim() }).select("_id").lean();
+    if (referrer) referredBy = referrer._id;
+  }
+
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await User.create({
     name: name.trim(),
@@ -55,9 +62,11 @@ export async function POST(req) {
     mobileNumber: mobileNumber.trim(),
     facebookProfile: facebookProfile.trim(),
     currentStatus,
+    referredBy,
   });
   await UserProgress.create({ user: user._id });
   await reconcileUserPayment(user);
+  await getOrCreateReferralCode(user._id);
 
   return NextResponse.json({ ok: true });
 }

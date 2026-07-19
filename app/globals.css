@@ -116,6 +116,43 @@ body {
 }
 .user-menu-item:hover { background: var(--bg); }
 
+.announcements-trigger { position: relative; }
+.announcements-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+.announcements-dropdown {
+  min-width: 300px;
+  max-width: 340px;
+  max-height: 380px;
+  overflow-y: auto;
+  color: var(--text);
+}
+.announcements-header {
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text) !important;
+  border-bottom: 1px solid var(--border);
+}
+.announcements-empty { padding: 16px 14px; font-size: 12.5px; color: var(--text-dim); }
+.announcement-item { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.announcement-item:last-child { border-bottom: none; }
+.announcement-item strong { font-size: 13px; color: var(--text); }
+.announcement-item p { margin: 4px 0; font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+.announcement-date { font-size: 11px; color: var(--text-dim); }
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -469,6 +506,13 @@ input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--coral); 
   border-left: 4px solid var(--coral);
   padding-left: 16px;
   margin: 18px 0;
+}
+
+.daily-motivation { position: relative; }
+.daily-motivation-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 .copy-btn { flex-shrink: 0; }

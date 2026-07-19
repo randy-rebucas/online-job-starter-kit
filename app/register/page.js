@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BookMarked } from "lucide-react";
 import { inputClass, selectClass } from "@/components/formStyles";
 import { CURRENT_STATUS_OPTIONS } from "@/lib/currentStatus";
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : "";
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,6 +24,15 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    // First-touch attribution: only store a referral code if one isn't
+    // already saved, so a later, unrelated link never overwrites the credit.
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref && !getCookie("ref_code")) {
+      document.cookie = `ref_code=${encodeURIComponent(ref)}; max-age=${30 * 24 * 60 * 60}; path=/`;
+    }
+  }, []);
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
@@ -27,7 +41,15 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, mobileNumber, facebookProfile, currentStatus }),
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          mobileNumber,
+          facebookProfile,
+          currentStatus,
+          referralCode: getCookie("ref_code"),
+        }),
       });
       const data = await res.json();
       if (!res.ok) {

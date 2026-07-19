@@ -18,6 +18,7 @@ const UserProgressSchema = new mongoose.Schema(
     trackers: { type: mongoose.Schema.Types.Mixed, default: {} },
     habits: { type: mongoose.Schema.Types.Mixed, default: {} },
     streaks: { type: mongoose.Schema.Types.Mixed, default: {} },
+    lastSeenAnnouncementsAt: { type: Date, default: null },
     theme: { type: String, default: null },
   },
   { timestamps: true }

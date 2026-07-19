@@ -15,10 +15,12 @@ import {
   Send,
   RefreshCw,
   Edit3,
+  Sparkles,
 } from "lucide-react";
 import CopyButton from "@/components/CopyButton";
 import Modal from "@/components/Modal";
 import { inputClass, textareaClass, selectClass } from "@/components/formStyles";
+import { PDF_INK, PDF_DIM, PDF_ACCENT, PDF_RULE } from "@/lib/pdfTheme";
 
 function slugifyFilename(title) {
   return (
@@ -34,10 +36,6 @@ function slugifyFilename(title) {
    resume data the on-screen preview renders, via jsPDF.
    ============================================================ */
 const PDF_MARGIN_X = 54;
-const PDF_INK = [27, 33, 64];
-const PDF_DIM = [92, 98, 128];
-const PDF_ACCENT = [255, 107, 74];
-const PDF_RULE = [230, 232, 240];
 
 async function buildResumePdf(v) {
   const { jsPDF } = await import("jspdf");
@@ -182,7 +180,74 @@ function ResumePdfButton({ v, className = "btn small subtle copy-btn" }) {
   );
 }
 
-function Field({ label, value, onChange, placeholder, textarea }) {
+/* ============================================================
+   AI ASSISTANT — sends the current field text to /api/ai/improve
+   and lets the user accept or discard the suggested rewrite.
+   ============================================================ */
+function AiImproveButton({ docType, text, onAccept }) {
+  const [loading, setLoading] = useState(false);
+  const [suggestion, setSuggestion] = useState(null);
+  const [error, setError] = useState("");
+
+  async function handleClick() {
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/ai/improve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: docType, text }),
+      });
+      const data = await res.json();
+      if (!res.ok) setError(data.error || "Couldn't improve this text right now.");
+      else setSuggestion(data.suggestion);
+    } catch {
+      setError("Couldn't reach the AI assistant.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="btn small subtle"
+        style={{ marginTop: 6 }}
+        onClick={handleClick}
+        disabled={loading || !text?.trim()}
+      >
+        <Sparkles size={14} /> {loading ? "Improving…" : "Improve with AI"}
+      </button>
+      {error && <div className="auth-error" style={{ marginTop: 6 }}>{error}</div>}
+      <Modal
+        open={!!suggestion}
+        onClose={() => setSuggestion(null)}
+        title="Suggested rewrite"
+        footer={
+          <>
+            <button className="btn small subtle" onClick={() => setSuggestion(null)}>
+              Discard
+            </button>
+            <button
+              className="btn small primary"
+              onClick={() => {
+                onAccept(suggestion);
+                setSuggestion(null);
+              }}
+            >
+              Accept
+            </button>
+          </>
+        }
+      >
+        <p style={{ whiteSpace: "pre-wrap", fontSize: 13.5 }}>{suggestion}</p>
+      </Modal>
+    </>
+  );
+}
+
+function Field({ label, value, onChange, placeholder, textarea, aiType }) {
   const id = useId();
   return (
     <div className="field">
@@ -210,6 +275,7 @@ function Field({ label, value, onChange, placeholder, textarea }) {
           onChange={(e) => onChange(e.target.value)}
         />
       )}
+      {aiType && <AiImproveButton docType={aiType} text={value} onAccept={onChange} />}
     </div>
   );
 }
@@ -628,6 +694,7 @@ function ResumeBuilder() {
             value={v.summary}
             onChange={set("summary")}
             textarea
+            aiType="resume"
           />
           <Field
             label="Skills (comma-separated)"
@@ -777,6 +844,7 @@ function CoverBuilder() {
             value={v.experience}
             onChange={set("experience")}
             textarea
+            aiType="cover"
           />
           <Field
             label="What makes you different"
@@ -921,6 +989,7 @@ function ProposalBuilder({ templates }) {
             placeholder="grew followers from 2K to 8K in 4 months"
             value={v.result}
             onChange={set("result")}
+            aiType="proposal"
           />
           <Field label="Years/experience level" placeholder="3 years" value={v.experience} onChange={set("experience")} />
           <Field
@@ -1021,6 +1090,7 @@ function LinkedInBuilder() {
             value={v.result}
             onChange={set("result")}
             textarea
+            aiType="linkedin"
           />
           <Field
             label="Call to action"
@@ -1091,6 +1161,7 @@ function ColdEmailBuilder() {
             value={v.observation}
             onChange={set("observation")}
             textarea
+            aiType="coldemail"
           />
           <Field
             label="Your service/value proposition"
@@ -1172,6 +1243,7 @@ function FollowUpBuilder() {
             value={v.addedValue}
             onChange={set("addedValue")}
             textarea
+            aiType="followup"
           />
           <Field
             label="Call to action"

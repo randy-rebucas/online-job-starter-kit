@@ -1,10 +1,15 @@
 "use client";
 
-import { Trophy, Calendar, Gift, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Trophy, Calendar, Gift, Sparkles, Award } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useProgress } from "@/components/ProgressContext";
+import { buildCertificatePdf } from "@/lib/certificatePdf";
 
 export default function ChallengeView({ daily, months, finalQuestions }) {
   const { state, patch, loading } = useProgress();
+  const { data: session } = useSession();
+  const [generating, setGenerating] = useState(false);
   if (loading) return null;
 
   function toggleDaily(key, checked) {
@@ -16,12 +21,39 @@ export default function ChallengeView({ daily, months, finalQuestions }) {
     });
   }
 
+  const totalMilestones = months.reduce((sum, m) => sum + m.milestones.length, 0);
+  const doneMilestones = Object.values(state.challenge.milestones).filter(Boolean).length;
+  const doneDaily = Object.values(state.challenge.daily).filter(Boolean).length;
+  const complete = doneDaily >= daily.length && doneMilestones >= totalMilestones;
+
+  async function downloadCertificate() {
+    setGenerating(true);
+    try {
+      const doc = await buildCertificatePdf({
+        name: session?.user?.name,
+        title: "90-Day Career Success Challenge",
+        subtitle: "From landed a job to confident, growing professional",
+      });
+      doc.save("90-day-challenge-certificate.pdf");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
   return (
     <>
       <h1 className="page-title">
         <Trophy size={22} /> 90-Day Career Success Challenge
       </h1>
       <p className="page-sub">From &quot;landed a job&quot; to confident, growing professional.</p>
+
+      {complete && (
+        <div className="card">
+          <button className="btn primary" onClick={downloadCertificate} disabled={generating}>
+            <Award size={16} /> {generating ? "Generating…" : "Download Certificate"}
+          </button>
+        </div>
+      )}
 
       <div className="card">
         <div className="section-title" style={{ marginTop: 0 }}>

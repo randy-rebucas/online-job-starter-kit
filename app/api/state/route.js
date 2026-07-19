@@ -19,6 +19,7 @@ function serialize(progress) {
     chapterChecks: progress.chapterChecks || {},
     trackers: progress.trackers || {},
     habits: progress.habits || {},
+    streaks: progress.streaks || {},
     theme: progress.theme || null,
   };
 }
@@ -32,7 +33,7 @@ export async function GET() {
   return NextResponse.json(serialize(progress));
 }
 
-const ALLOWED_FIELDS = ["roadmap", "challenge", "chapterChecks", "trackers", "habits", "theme"];
+const ALLOWED_FIELDS = ["roadmap", "challenge", "chapterChecks", "trackers", "habits", "streaks", "theme"];
 
 export async function PATCH(req) {
   const session = await auth();

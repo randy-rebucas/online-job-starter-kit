@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TrendingUp, Download, X, RefreshCw, BarChart3, Plus } from "lucide-react";
+import { TrendingUp, Download, X, RefreshCw, BarChart3, Plus, BellRing } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
 
 function makeId() {
@@ -114,6 +114,30 @@ function ApplicationAnalytics({ rows, statusColIndex }) {
   );
 }
 
+// Surfaces rows still sitting at "Applied" more than a week after their date
+// column, so stalled applications don't silently fall off the user's radar.
+function NeedsFollowUp({ rows, statusColIndex, dateColIndex }) {
+  if (dateColIndex === -1) return null;
+  const now = Date.now();
+  const stale = rows.filter((r) => {
+    if (classifyStatus(r[statusColIndex]) !== "applied") return false;
+    const date = new Date(r[dateColIndex]);
+    if (Number.isNaN(date.getTime())) return false;
+    return now - date.getTime() > 7 * 24 * 60 * 60 * 1000;
+  });
+  if (!stale.length) return null;
+  return (
+    <div className="card" style={{ borderColor: "#e5484d" }}>
+      <div className="section-title" style={{ marginTop: 0, color: "#e5484d" }}>
+        <BellRing size={18} /> Needs Follow-up ({stale.length})
+      </div>
+      <p style={{ fontSize: 13, color: "var(--text-dim)" }}>
+        These applications have been sitting at &quot;Applied&quot; for over a week — consider sending a follow-up.
+      </p>
+    </div>
+  );
+}
+
 function EditableTracker({ tracker }) {
   console.log("EditableTracker render", tracker.length);
   const { state, patch } = useProgress();
@@ -154,11 +178,15 @@ function EditableTracker({ tracker }) {
   }
 
   const statusColIndex = tracker.cols.indexOf("Status");
+  const dateColIndex = tracker.cols.findIndex((c) => /date/i.test(c));
   const isEmpty = rows.length === 1 && rows[0].every((c) => !(c || "").trim());
   const cellPlaceholder = (ri) => (isEmpty && ri === 0 ? "Click to add an entry…" : "");
 
   return (
     <>
+      {statusColIndex !== -1 && (
+        <NeedsFollowUp rows={rows} statusColIndex={statusColIndex} dateColIndex={dateColIndex} />
+      )}
       {statusColIndex !== -1 && <ApplicationAnalytics rows={rows} statusColIndex={statusColIndex} />}
       <div className="card">
         <div className="flex-between">
@@ -186,19 +214,39 @@ function EditableTracker({ tracker }) {
               {rows.map((row, ri) => {
                 return (
                   <tr key={ids[ri]}>
-                    {row.map((cell, ci) => (
-                      <td
-                        key={ci}
-                        contentEditable
-                        suppressContentEditableWarning
-                        role="textbox"
-                        aria-label={`${tracker.cols[ci]}, row ${ri + 1}`}
-                        data-placeholder={ci === 0 ? cellPlaceholder(ri) : ""}
-                        onBlur={(e) => editCell(ri, ci, e.target.textContent)}
-                      >
-                        {cell}
-                      </td>
-                    ))}
+                    {row.map((cell, ci) =>
+                      ci === statusColIndex ? (
+                        <td key={ci}>
+                          <select
+                            aria-label={`${tracker.cols[ci]}, row ${ri + 1}`}
+                            className="select-cell"
+                            value={STATUS_STAGES.some((s) => s.label === cell) ? cell : ""}
+                            onChange={(e) => editCell(ri, ci, e.target.value)}
+                          >
+                            <option value="" disabled>
+                              Select status…
+                            </option>
+                            {STATUS_STAGES.map((s) => (
+                              <option key={s.key} value={s.label}>
+                                {s.label}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                      ) : (
+                        <td
+                          key={ci}
+                          contentEditable
+                          suppressContentEditableWarning
+                          role="textbox"
+                          aria-label={`${tracker.cols[ci]}, row ${ri + 1}`}
+                          data-placeholder={ci === 0 ? cellPlaceholder(ri) : ""}
+                          onBlur={(e) => editCell(ri, ci, e.target.textContent)}
+                        >
+                          {cell}
+                        </td>
+                      )
+                    )}
                     <td>
                       {!isEmpty && (
                         <button

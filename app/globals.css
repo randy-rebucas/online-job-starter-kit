@@ -172,6 +172,65 @@ body {
 }
 .nav-item:hover { background: var(--bg); color: var(--text); }
 .nav-item.active { background: var(--coral); color: #fff; }
+.nav-item svg, .user-menu-item svg, .user-menu-trigger svg, .sidebar-footer-item svg, .sidebar-ebook-label svg {
+  flex-shrink: 0;
+  display: block;
+}
+.nav-item span, .sidebar-footer-item span { line-height: 1; }
+
+.sidebar-ebook {
+  margin-top: 16px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--text);
+  overflow: hidden;
+}
+.sidebar-ebook-thumb {
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--radius) - 4px);
+  display: block;
+}
+.sidebar-ebook-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1;
+}
+.sidebar-ebook-icon { flex-shrink: 0; }
+.sidebar-ebook:hover { border-color: var(--coral); }
+.sidebar-ebook:hover .sidebar-ebook-label { color: var(--coral); }
+@media (max-width: 900px) {
+  .sidebar-ebook { display: none; }
+}
+
+.sidebar-footer {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sidebar-footer-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-weight: 700;
+  color: var(--coral);
+  background: rgba(255, 107, 74, 0.08);
+}
+.sidebar-footer-item:hover {
+  background: var(--coral);
+  color: #fff;
+  border-color: var(--coral);
+}
+.sidebar-footer-item.active { background: var(--coral); color: #fff; }
 
 .content {
   flex: 1;
@@ -182,7 +241,7 @@ body {
   overflow-x: hidden;
 }
 
-h1.page-title { font-size: 26px; margin: 0 0 4px; }
+h1.page-title { font-size: 26px; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
 p.page-sub { color: var(--text-dim); margin: 0 0 24px; font-size: 14px; }
 
 .card {
@@ -383,6 +442,16 @@ input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--coral); 
   color: var(--text-dim);
   font-style: italic;
 }
+.select-cell {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+.select-cell:focus { outline: none; background: rgba(255,107,74,0.08); }
 
 .callout {
   border-left: 4px solid var(--coral);

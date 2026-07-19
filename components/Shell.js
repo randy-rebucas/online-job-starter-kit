@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
@@ -18,12 +19,17 @@ import {
   BarChart3,
   User,
   BookMarked,
+  Download,
+  Users,
+  MessageSquarePlus,
   SunMoon,
   LogOut,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
 import { useProgress } from "./ProgressContext";
+
+const FACEBOOK_GROUP_URL = "https://www.facebook.com/groups/1540342570926998";
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: Home, label: "Home" },
@@ -37,7 +43,6 @@ const NAV_ITEMS = [
   { href: "/tools", icon: Wrench, label: "AI Tools Cheat Sheet" },
   { href: "/salary", icon: DollarSign, label: "Salary Guide" },
   { href: "/trackers", icon: BarChart3, label: "Trackers" },
-  { href: "/profile", icon: User, label: "Profile" },
 ];
 
 export default function Shell({ children }) {
@@ -116,6 +121,36 @@ export default function Shell({ children }) {
               </Link>
             );
           })}
+          <a href="/api/download/ebook" className="card sidebar-ebook" download>
+            <Image
+              src="/images/online-kit.png"
+              alt="Online Job Starter Kit ebook cover"
+              width={1536}
+              height={1024}
+              sizes="200px"
+              className="sidebar-ebook-thumb"
+            />
+            <span className="sidebar-ebook-label">
+              <Download size={16} className="sidebar-ebook-icon" />
+              <span>Download Ebook</span>
+            </span>
+          </a>
+          <div className="sidebar-footer">
+            <a
+              href={FACEBOOK_GROUP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-item sidebar-footer-item"
+            >
+              <Users size={18} /> <span>Facebook Community</span>
+            </a>
+            <Link
+              href="/suggest"
+              className={`nav-item sidebar-footer-item${pathname === "/suggest" ? " active" : ""}`}
+            >
+              <MessageSquarePlus size={18} /> <span>Suggest a Feature</span>
+            </Link>
+          </div>
         </nav>
         <main className="content">{children}</main>
       </div>

@@ -1,17 +1,37 @@
 "use client";
 
-import { Calendar } from "lucide-react";
+import { useState } from "react";
+import { Calendar, Award } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useProgress } from "@/components/ProgressContext";
+import { buildCertificatePdf } from "@/lib/certificatePdf";
 
 export default function RoadmapView({ roadmap }) {
   const { state, patch, loading } = useProgress();
+  const { data: session } = useSession();
+  const [generating, setGenerating] = useState(false);
   if (loading) return null;
 
   const doneDays = Object.values(state.roadmap).filter(Boolean).length;
   const pct = Math.round((doneDays / 30) * 100);
+  const complete = doneDays >= 30;
 
   function toggleDay(day, checked) {
     patch({ roadmap: { ...state.roadmap, [day]: checked } });
+  }
+
+  async function downloadCertificate() {
+    setGenerating(true);
+    try {
+      const doc = await buildCertificatePdf({
+        name: session?.user?.name,
+        title: "30-Day Roadmap",
+        subtitle: "From Zero Experience to a Thriving Remote Career",
+      });
+      doc.save("30-day-roadmap-certificate.pdf");
+    } finally {
+      setGenerating(false);
+    }
   }
 
   return (
@@ -30,6 +50,11 @@ export default function RoadmapView({ roadmap }) {
         <div className="progress-bar" style={{ marginTop: 8 }}>
           <div style={{ width: `${pct}%` }} />
         </div>
+        {complete && (
+          <button className="btn primary" style={{ marginTop: 12 }} onClick={downloadCertificate} disabled={generating}>
+            <Award size={16} /> {generating ? "Generating…" : "Download Certificate"}
+          </button>
+        )}
       </div>
       {roadmap.map((week) => (
         <div className="week-block" key={week.week}>

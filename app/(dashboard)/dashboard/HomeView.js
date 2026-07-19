@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Rocket, Calendar, FileText, Bot, BookOpen, Hand } from "lucide-react";
+import { Rocket, Calendar, FileText, Bot, BookOpen, Hand, Flame, Award, Users } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
+import { computeBadges } from "@/lib/badges";
+
+const FACEBOOK_GROUP_URL = "https://www.facebook.com/groups/1540342570926998";
 
 export default function HomeView({ chapters, promptCount, jobBoardCount }) {
   const { state, loading } = useProgress();
@@ -20,6 +23,8 @@ export default function HomeView({ chapters, promptCount, jobBoardCount }) {
     });
   });
   const checklistPct = totalChecks ? Math.round((doneChecks / totalChecks) * 100) : 0;
+  const badges = computeBadges(state, chapters);
+  const streak = state.streaks || {};
 
   if (loading) return null;
 
@@ -61,6 +66,55 @@ export default function HomeView({ chapters, promptCount, jobBoardCount }) {
         <div className="progress-bar" style={{ marginTop: 8 }}>
           <div style={{ width: `${roadmapPct}%` }} />
         </div>
+      </div>
+
+      <div className="card">
+        <div className="flex-between">
+          <strong>
+            <Flame size={16} style={{ verticalAlign: "middle", color: "var(--coral)" }} /> Daily Streak
+          </strong>
+          <span>{streak.currentStreak || 0} day{(streak.currentStreak || 0) === 1 ? "" : "s"} · best {streak.longestStreak || 0}</span>
+        </div>
+        <div className="section-title" style={{ marginTop: 14 }}>
+          <Award size={16} /> Badges
+        </div>
+        <div className="grid cols-4">
+          {badges.map((b) => (
+            <div
+              key={b.id}
+              className="badge"
+              style={{
+                textAlign: "center",
+                padding: "10px 6px",
+                opacity: b.earned ? 1 : 0.4,
+                background: b.earned ? "var(--coral)" : "var(--bg)",
+                color: b.earned ? "#fff" : "var(--text-dim)",
+              }}
+            >
+              {b.label}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="flex-between">
+          <strong>
+            <Users size={16} style={{ verticalAlign: "middle", color: "var(--coral)" }} /> Join the Community
+          </strong>
+        </div>
+        <p style={{ color: "var(--text-dim)", fontSize: 13, marginTop: 6 }}>
+          Connect with other members, ask questions, and share wins in our Facebook group.
+        </p>
+        <a
+          href={FACEBOOK_GROUP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn primary"
+          style={{ marginTop: 4, display: "inline-flex" }}
+        >
+          <Users size={16} /> Like &amp; Join the Facebook Group
+        </a>
       </div>
 
       <div className="section-title">

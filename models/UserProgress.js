@@ -17,6 +17,7 @@ const UserProgressSchema = new mongoose.Schema(
     chapterChecks: { type: mongoose.Schema.Types.Mixed, default: {} },
     trackers: { type: mongoose.Schema.Types.Mixed, default: {} },
     habits: { type: mongoose.Schema.Types.Mixed, default: {} },
+    streaks: { type: mongoose.Schema.Types.Mixed, default: {} },
     theme: { type: String, default: null },
   },
   { timestamps: true }

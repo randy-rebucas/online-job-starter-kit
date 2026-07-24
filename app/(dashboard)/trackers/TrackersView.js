@@ -118,6 +118,7 @@ function ApplicationAnalytics({ rows, statusColIndex }) {
 // column, so stalled applications don't silently fall off the user's radar.
 function NeedsFollowUp({ rows, statusColIndex, dateColIndex }) {
   if (dateColIndex === -1) return null;
+  // eslint-disable-next-line react-hooks/purity -- intentional: recomputed each render so "stale" stays accurate as time passes
   const now = Date.now();
   const stale = rows.filter((r) => {
     if (classifyStatus(r[statusColIndex]) !== "applied") return false;

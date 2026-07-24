@@ -1136,3 +1136,41 @@ a.btn { text-decoration: none; text-align: center; }
 }
 
 .form-error { color: #e5484d; font-size: 12.5px; margin: 4px 0 0; }
+
+.conversation-list-actions { display: flex; flex-direction: column; gap: 6px; }
+.conversation-list-actions .btn { justify-content: center; display: flex; align-items: center; gap: 6px; }
+
+.nav-badge.requests { background: var(--emerald); }
+.nav-item.active .nav-badge.requests { background: #fff; color: var(--emerald); }
+
+.thread-header-action {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-search-item.static { cursor: default; }
+.user-search-item.static:hover { background: transparent; }
+.user-search-item.static > span:nth-child(2) { flex: 1; min-width: 0; }
+.member-role-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--coral);
+}
+.join-request-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.modal-section-label {
+  margin: 16px 0 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.conversation-avatar.group.small { width: 30px; height: 30px; }

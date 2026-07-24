@@ -21,6 +21,7 @@ export async function GET() {
   const conversations = await Conversation.find({ participants: session.user.id })
     .sort({ lastMessageAt: -1, updatedAt: -1 })
     .populate("participants", "name email lastSeenAt")
+    .populate("joinRequests", "name email")
     .lean();
 
   const results = await Promise.all(
@@ -31,6 +32,7 @@ export async function GET() {
         readBy: { $ne: session.user.id },
       });
       const others = c.participants.filter((p) => p._id.toString() !== session.user.id);
+      const isCreator = c.createdBy?.toString() === session.user.id;
 
       const base = {
         id: c._id.toString(),
@@ -44,8 +46,17 @@ export async function GET() {
         return {
           ...base,
           name: c.name,
+          isCreator,
           memberCount: c.participants.length,
           members: others.map((m) => ({ id: m._id.toString(), name: m.name, online: isOnline(m) })),
+          allMembers: c.participants.map((m) => ({
+            id: m._id.toString(),
+            name: m.name,
+            online: isOnline(m),
+            isSelf: m._id.toString() === session.user.id,
+            isCreator: m._id.toString() === c.createdBy?.toString(),
+          })),
+          joinRequests: isCreator ? (c.joinRequests || []).map((u) => ({ id: u._id.toString(), name: u.name })) : [],
         };
       }
 
@@ -93,8 +104,14 @@ export async function POST(req) {
       id: conversation._id.toString(),
       isGroup: true,
       name: groupName,
+      isCreator: true,
       memberCount: conversation.participants.length,
       members: members.map((m) => ({ id: m._id.toString(), name: m.name, online: false })),
+      allMembers: [
+        { id: session.user.id, name: session.user.name, online: true, isSelf: true, isCreator: true },
+        ...members.map((m) => ({ id: m._id.toString(), name: m.name, online: false, isSelf: false, isCreator: false })),
+      ],
+      joinRequests: [],
     });
   }
 

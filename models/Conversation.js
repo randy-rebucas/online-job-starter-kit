@@ -6,6 +6,7 @@ const ConversationSchema = new mongoose.Schema(
     isGroup: { type: Boolean, default: false },
     name: { type: String, default: "" },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    joinRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     lastMessageAt: { type: Date, default: null },
     lastMessagePreview: { type: String, default: "" },
   },

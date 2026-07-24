@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Send, Paperclip, Smile, X, FileText, Users } from "lucide-react";
+import { Send, Paperclip, Smile, X, FileText, Users, Check, Compass } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import Modal from "@/components/Modal";
 import { useMessages } from "@/components/MessagesContext";
@@ -173,6 +173,126 @@ function NewConversationModal({ open, onClose, onStarted }) {
   );
 }
 
+function MembersModal({ open, onClose, conversation, onlineMap, onRequestHandled }) {
+  async function handleRequest(userId, action) {
+    await fetch(`/api/messages/conversations/${conversation.id}/members`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, action }),
+    });
+    onRequestHandled();
+  }
+
+  if (!conversation) return null;
+
+  return (
+    <Modal open={open} onClose={onClose} title={`Members of ${conversation.name}`}>
+      <div className="user-search-results">
+        {(conversation.allMembers || []).map((m) => (
+          <div key={m.id} className="user-search-item static">
+            <span className="conversation-avatar small">
+              {m.name?.charAt(0)?.toUpperCase()}
+              <span className={`online-dot${onlineMap[m.id] || m.isSelf ? " online" : ""}`} />
+            </span>
+            <span>
+              <strong>{m.name} {m.isSelf && "(you)"}</strong>
+              {m.isCreator && <span className="member-role-badge">Creator</span>}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {conversation.isCreator && (
+        <>
+          <div className="modal-section-label">Pending join requests</div>
+          {!conversation.joinRequests?.length && (
+            <div className="announcements-empty">No pending requests.</div>
+          )}
+          <div className="user-search-results">
+            {(conversation.joinRequests || []).map((r) => (
+              <div key={r.id} className="user-search-item static">
+                <span className="conversation-avatar small">{r.name?.charAt(0)?.toUpperCase()}</span>
+                <span><strong>{r.name}</strong></span>
+                <span className="join-request-actions">
+                  <button className="btn small primary" onClick={() => handleRequest(r.id, "approve")}>
+                    <Check size={13} />
+                  </button>
+                  <button className="btn small subtle" onClick={() => handleRequest(r.id, "decline")}>
+                    <X size={13} />
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </Modal>
+  );
+}
+
+function DiscoverGroupsModal({ open, onClose, onJoined }) {
+  const [query, setQuery] = useState("");
+  const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const search = useCallback((q) => {
+    setLoading(true);
+    fetch(`/api/messages/groups/discover?q=${encodeURIComponent(q)}`)
+      .then((res) => res.json())
+      .then((data) => setGroups(Array.isArray(data) ? data : []))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    search(query);
+  }, [open, query, search]);
+
+  async function requestJoin(groupId) {
+    const res = await fetch(`/api/messages/conversations/${groupId}/join`, { method: "POST" });
+    if (!res.ok) return;
+    setGroups((prev) => prev.map((g) => (g.id === groupId ? { ...g, requested: true } : g)));
+    onJoined();
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Discover study groups">
+      <input
+        className={inputClass}
+        placeholder="Search groups by name…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        autoFocus
+      />
+      <div className="user-search-results">
+        {loading && <div className="announcements-empty">Loading…</div>}
+        {!loading && !groups.length && <div className="announcements-empty">No groups found.</div>}
+        {groups.map((g) => (
+          <div key={g.id} className="user-search-item static">
+            <span className="conversation-avatar group small">
+              <Users size={14} />
+            </span>
+            <span>
+              <strong>{g.name}</strong>
+              <span className="user-search-email">
+                {g.memberCount} members · created by {g.creatorName}
+              </span>
+            </span>
+            <button
+              className="btn small subtle"
+              disabled={g.requested}
+              onClick={() => requestJoin(g.id)}
+            >
+              {g.requested ? "Requested" : "Request to join"}
+            </button>
+          </div>
+        ))}
+      </div>
+    </Modal>
+  );
+}
+
 export default function MessagesView() {
   const { data: session } = useSession();
   const { conversations, activeUsers, onlineMap, refreshConversations, subscribe } = useMessages();
@@ -183,6 +303,8 @@ export default function MessagesView() {
   const [uploading, setUploading] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [showNewConvo, setShowNewConvo] = useState(false);
+  const [showDiscover, setShowDiscover] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
   const emojiRef = useRef(null);
   const fileInputRef = useRef(null);
   const threadEndRef = useRef(null);
@@ -322,9 +444,14 @@ export default function MessagesView() {
 
       <div className="messages-layout">
         <div className="conversation-list">
-          <button className="btn small" onClick={() => setShowNewConvo(true)}>
-            New conversation / group
-          </button>
+          <div className="conversation-list-actions">
+            <button className="btn small" onClick={() => setShowNewConvo(true)}>
+              New conversation / group
+            </button>
+            <button className="btn small subtle" onClick={() => setShowDiscover(true)} title="Discover study groups">
+              <Compass size={14} /> Discover groups
+            </button>
+          </div>
           {!conversations.length && (
             <div className="announcements-empty">No conversations yet. Start one above.</div>
           )}
@@ -352,6 +479,9 @@ export default function MessagesView() {
                 </span>
               </span>
               {c.unreadCount > 0 && <span className="nav-badge">{c.unreadCount}</span>}
+              {c.isGroup && c.isCreator && c.joinRequests?.length > 0 && (
+                <span className="nav-badge requests">{c.joinRequests.length}</span>
+              )}
             </button>
           ))}
         </div>
@@ -369,6 +499,12 @@ export default function MessagesView() {
                       {activeConversation.members.filter((m) => onlineMap[m.id]).length} of{" "}
                       {activeConversation.memberCount} online
                     </span>
+                    <button className="btn small subtle thread-header-action" onClick={() => setShowMembers(true)}>
+                      <Users size={14} /> Members
+                      {activeConversation.isCreator && activeConversation.joinRequests?.length > 0 && (
+                        <span className="nav-badge requests">{activeConversation.joinRequests.length}</span>
+                      )}
+                    </button>
                   </>
                 ) : (
                   <>
@@ -464,6 +600,20 @@ export default function MessagesView() {
           refreshConversations();
           setActiveId(id);
         }}
+      />
+
+      <DiscoverGroupsModal
+        open={showDiscover}
+        onClose={() => setShowDiscover(false)}
+        onJoined={refreshConversations}
+      />
+
+      <MembersModal
+        open={showMembers}
+        onClose={() => setShowMembers(false)}
+        conversation={activeConversation?.isGroup ? activeConversation : null}
+        onlineMap={onlineMap}
+        onRequestHandled={refreshConversations}
       />
     </div>
   );

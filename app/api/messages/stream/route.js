@@ -47,6 +47,7 @@ export async function GET(req) {
               createdAt: { $gt: since },
             })
               .sort({ createdAt: 1 })
+              .populate("sender", "name")
               .lean();
 
             for (const m of newMessages) {
@@ -55,7 +56,8 @@ export async function GET(req) {
                   sseEvent("message", {
                     id: m._id.toString(),
                     conversationId: m.conversation.toString(),
-                    sender: m.sender.toString(),
+                    sender: m.sender._id.toString(),
+                    senderName: m.sender.name,
                     text: m.text,
                     attachments: m.attachments || [],
                     createdAt: m.createdAt,
@@ -66,13 +68,14 @@ export async function GET(req) {
           }
 
           for (const c of conversations) {
-            const other = c.participants.find((p) => p._id.toString() !== userId);
-            if (!other) continue;
-            const online = isOnline(other);
-            const key = other._id.toString();
-            if (knownOnline.get(key) !== online) {
-              knownOnline.set(key, online);
-              controller.enqueue(encoder.encode(sseEvent("presence", { userId: key, online })));
+            const others = c.participants.filter((p) => p._id.toString() !== userId);
+            for (const other of others) {
+              const online = isOnline(other);
+              const key = other._id.toString();
+              if (knownOnline.get(key) !== online) {
+                knownOnline.set(key, online);
+                controller.enqueue(encoder.encode(sseEvent("presence", { userId: key, online })));
+              }
             }
           }
 

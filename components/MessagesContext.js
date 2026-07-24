@@ -3,9 +3,11 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 const MessagesContext = createContext(null);
+const ACTIVE_USERS_POLL_MS = 20000;
 
 export function MessagesProvider({ children }) {
   const [conversations, setConversations] = useState([]);
+  const [activeUsers, setActiveUsers] = useState([]);
   const [onlineMap, setOnlineMap] = useState({});
   const [incomingMessage, setIncomingMessage] = useState(null);
   const listenersRef = useRef(new Set());
@@ -19,7 +21,20 @@ export function MessagesProvider({ children }) {
       const next = { ...prev };
       for (const c of data) {
         if (c.otherUser) next[c.otherUser.id] = c.otherUser.online;
+        if (c.members) for (const m of c.members) next[m.id] = m.online;
       }
+      return next;
+    });
+  }, []);
+
+  const refreshActiveUsers = useCallback(async () => {
+    const res = await fetch("/api/messages/active-users");
+    if (!res.ok) return;
+    const data = await res.json();
+    setActiveUsers(Array.isArray(data) ? data : []);
+    setOnlineMap((prev) => {
+      const next = { ...prev };
+      for (const u of data) next[u.id] = true;
       return next;
     });
   }, []);
@@ -27,7 +42,10 @@ export function MessagesProvider({ children }) {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshConversations();
-  }, [refreshConversations]);
+    refreshActiveUsers();
+    const interval = setInterval(refreshActiveUsers, ACTIVE_USERS_POLL_MS);
+    return () => clearInterval(interval);
+  }, [refreshConversations, refreshActiveUsers]);
 
   useEffect(() => {
     const source = new EventSource("/api/messages/stream");
@@ -56,7 +74,15 @@ export function MessagesProvider({ children }) {
 
   return (
     <MessagesContext.Provider
-      value={{ conversations, onlineMap, unreadCount, incomingMessage, refreshConversations, subscribe }}
+      value={{
+        conversations,
+        activeUsers,
+        onlineMap,
+        unreadCount,
+        incomingMessage,
+        refreshConversations,
+        subscribe,
+      }}
     >
       {children}
     </MessagesContext.Provider>

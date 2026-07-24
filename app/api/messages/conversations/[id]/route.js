@@ -20,7 +20,11 @@ export async function GET(req, { params }) {
   const conversation = await loadConversationForUser(id, session.user.id);
   if (!conversation) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const messages = await Message.find({ conversation: id }).sort({ createdAt: 1 }).limit(200).lean();
+  const messages = await Message.find({ conversation: id })
+    .sort({ createdAt: 1 })
+    .limit(200)
+    .populate("sender", "name")
+    .lean();
 
   await Message.updateMany(
     { conversation: id, sender: { $ne: session.user.id }, readBy: { $ne: session.user.id } },
@@ -30,7 +34,8 @@ export async function GET(req, { params }) {
   return NextResponse.json(
     messages.map((m) => ({
       id: m._id.toString(),
-      sender: m.sender.toString(),
+      sender: m.sender._id.toString(),
+      senderName: m.sender.name,
       text: m.text,
       attachments: m.attachments || [],
       createdAt: m.createdAt,
@@ -72,6 +77,7 @@ export async function POST(req, { params }) {
   return NextResponse.json({
     id: message._id.toString(),
     sender: session.user.id,
+    senderName: session.user.name,
     text: message.text,
     attachments: message.attachments,
     createdAt: message.createdAt,

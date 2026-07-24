@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Send, Paperclip, Smile, X, FileText } from "lucide-react";
+import { Send, Paperclip, Smile, X, FileText, Users } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import Modal from "@/components/Modal";
 import { useMessages } from "@/components/MessagesContext";
@@ -13,9 +13,25 @@ function isImageAttachment(attachment) {
 }
 
 function NewConversationModal({ open, onClose, onStarted }) {
+  const [mode, setMode] = useState("direct");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [selected, setSelected] = useState([]);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMode("direct");
+      setQuery("");
+      setResults([]);
+      setGroupName("");
+      setSelected([]);
+      setError("");
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -41,14 +57,73 @@ function NewConversationModal({ open, onClose, onStarted }) {
     });
     if (!res.ok) return;
     const data = await res.json();
-    setQuery("");
-    setResults([]);
+    onStarted(data.id);
+    onClose();
+  }
+
+  function toggleSelected(user) {
+    setSelected((prev) =>
+      prev.some((u) => u.id === user.id) ? prev.filter((u) => u.id !== user.id) : [...prev, user]
+    );
+  }
+
+  async function createGroup() {
+    setError("");
+    if (!groupName.trim()) return setError("Group name is required.");
+    if (!selected.length) return setError("Add at least one member.");
+
+    const res = await fetch("/api/messages/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ groupName: groupName.trim(), participantIds: selected.map((u) => u.id) }),
+    });
+    const data = await res.json();
+    if (!res.ok) return setError(data.error || "Failed to create group.");
     onStarted(data.id);
     onClose();
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="New conversation">
+    <Modal open={open} onClose={onClose} title={mode === "direct" ? "New conversation" : "New study group"}>
+      <div className="convo-mode-toggle">
+        <button
+          type="button"
+          className={`btn small${mode === "direct" ? " primary" : " subtle"}`}
+          onClick={() => setMode("direct")}
+        >
+          Direct message
+        </button>
+        <button
+          type="button"
+          className={`btn small${mode === "group" ? " primary" : " subtle"}`}
+          onClick={() => setMode("group")}
+        >
+          Study group
+        </button>
+      </div>
+
+      {mode === "group" && (
+        <input
+          className={inputClass}
+          placeholder="Group name (e.g. Batch 2026 Study Group)"
+          value={groupName}
+          onChange={(e) => setGroupName(e.target.value)}
+        />
+      )}
+
+      {mode === "group" && selected.length > 0 && (
+        <div className="selected-members">
+          {selected.map((u) => (
+            <span key={u.id} className="selected-member-chip">
+              {u.name}
+              <button type="button" onClick={() => toggleSelected(u)} aria-label={`Remove ${u.name}`}>
+                <X size={12} />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
       <input
         className={inputClass}
         placeholder="Search by name or email…"
@@ -61,23 +136,46 @@ function NewConversationModal({ open, onClose, onStarted }) {
         {!searching && query.trim() && !results.length && (
           <div className="announcements-empty">No users found.</div>
         )}
-        {results.map((u) => (
-          <button key={u.id} className="user-search-item" onClick={() => startWith(u.id)}>
-            <span className="user-search-avatar">{u.name?.charAt(0)?.toUpperCase()}</span>
-            <span>
-              <strong>{u.name}</strong>
-              <span className="user-search-email">{u.email}</span>
-            </span>
-          </button>
-        ))}
+        {results.map((u) =>
+          mode === "direct" ? (
+            <button key={u.id} className="user-search-item" onClick={() => startWith(u.id)}>
+              <span className="user-search-avatar">{u.name?.charAt(0)?.toUpperCase()}</span>
+              <span>
+                <strong>{u.name}</strong>
+                <span className="user-search-email">{u.email}</span>
+              </span>
+            </button>
+          ) : (
+            <button
+              key={u.id}
+              className={`user-search-item${selected.some((s) => s.id === u.id) ? " selected" : ""}`}
+              onClick={() => toggleSelected(u)}
+            >
+              <span className="user-search-avatar">{u.name?.charAt(0)?.toUpperCase()}</span>
+              <span>
+                <strong>{u.name}</strong>
+                <span className="user-search-email">{u.email}</span>
+              </span>
+            </button>
+          )
+        )}
       </div>
+
+      {mode === "group" && (
+        <>
+          {error && <p className="form-error">{error}</p>}
+          <button type="button" className="btn primary" onClick={createGroup}>
+            Create group
+          </button>
+        </>
+      )}
     </Modal>
   );
 }
 
 export default function MessagesView() {
   const { data: session } = useSession();
-  const { conversations, onlineMap, refreshConversations, subscribe } = useMessages();
+  const { conversations, activeUsers, onlineMap, refreshConversations, subscribe } = useMessages();
   const [activeId, setActiveId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -188,15 +286,44 @@ export default function MessagesView() {
     refreshConversations();
   }
 
+  async function startWithActiveUser(userId) {
+    const res = await fetch("/api/messages/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    refreshConversations();
+    setActiveId(data.id);
+  }
+
   return (
     <div>
       <h1>Messages</h1>
-      <p className="page-sub">Chat with other members of the community.</p>
+      <p className="page-sub">Chat and study together with other members of the community.</p>
+
+      {activeUsers.length > 0 && (
+        <div className="active-users-panel">
+          <span className="active-users-label">Active now</span>
+          <div className="active-users-row">
+            {activeUsers.map((u) => (
+              <button key={u.id} className="active-user-chip" onClick={() => startWithActiveUser(u.id)} title={`Message ${u.name}`}>
+                <span className="conversation-avatar small">
+                  {u.name?.charAt(0)?.toUpperCase()}
+                  <span className="online-dot online" />
+                </span>
+                <span>{u.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="messages-layout">
         <div className="conversation-list">
           <button className="btn small" onClick={() => setShowNewConvo(true)}>
-            New conversation
+            New conversation / group
           </button>
           {!conversations.length && (
             <div className="announcements-empty">No conversations yet. Start one above.</div>
@@ -207,13 +334,22 @@ export default function MessagesView() {
               className={`conversation-item${c.id === activeId ? " active" : ""}`}
               onClick={() => setActiveId(c.id)}
             >
-              <span className="conversation-avatar">
-                {c.otherUser?.name?.charAt(0)?.toUpperCase()}
-                <span className={`online-dot${onlineMap[c.otherUser?.id] ? " online" : ""}`} />
-              </span>
+              {c.isGroup ? (
+                <span className="conversation-avatar group">
+                  <Users size={16} />
+                </span>
+              ) : (
+                <span className="conversation-avatar">
+                  {c.otherUser?.name?.charAt(0)?.toUpperCase()}
+                  <span className={`online-dot${onlineMap[c.otherUser?.id] ? " online" : ""}`} />
+                </span>
+              )}
               <span className="conversation-meta">
-                <strong>{c.otherUser?.name || "Unknown user"}</strong>
-                <span className="conversation-preview">{c.lastMessagePreview}</span>
+                <strong>{c.isGroup ? c.name : c.otherUser?.name || "Unknown user"}</strong>
+                <span className="conversation-preview">
+                  {c.isGroup ? `${c.memberCount} members · ` : ""}
+                  {c.lastMessagePreview}
+                </span>
               </span>
               {c.unreadCount > 0 && <span className="nav-badge">{c.unreadCount}</span>}
             </button>
@@ -226,32 +362,47 @@ export default function MessagesView() {
           ) : (
             <>
               <div className="message-thread-header">
-                <strong>{activeConversation.otherUser?.name}</strong>
-                <span className={`online-status${onlineMap[activeConversation.otherUser?.id] ? " online" : ""}`}>
-                  {onlineMap[activeConversation.otherUser?.id] ? "Online" : "Offline"}
-                </span>
+                {activeConversation.isGroup ? (
+                  <>
+                    <strong>{activeConversation.name}</strong>
+                    <span className="online-status">
+                      {activeConversation.members.filter((m) => onlineMap[m.id]).length} of{" "}
+                      {activeConversation.memberCount} online
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <strong>{activeConversation.otherUser?.name}</strong>
+                    <span className={`online-status${onlineMap[activeConversation.otherUser?.id] ? " online" : ""}`}>
+                      {onlineMap[activeConversation.otherUser?.id] ? "Online" : "Offline"}
+                    </span>
+                  </>
+                )}
               </div>
 
               <div className="message-thread-body">
-                {messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`message-bubble${m.sender === session?.user?.id ? " own" : " other"}`}
-                  >
-                    {m.text && <p>{m.text}</p>}
-                    {(m.attachments || []).map((a, i) =>
-                      isImageAttachment(a) ? (
-                        <a key={i} href={a.url} target="_blank" rel="noopener noreferrer">
-                          <img src={a.url} alt={a.name} className="attachment-preview" />
-                        </a>
-                      ) : (
-                        <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="attachment-file">
-                          <FileText size={16} /> {a.name}
-                        </a>
-                      )
-                    )}
-                  </div>
-                ))}
+                {messages.map((m) => {
+                  const own = m.sender === session?.user?.id;
+                  return (
+                    <div key={m.id} className={`message-bubble${own ? " own" : " other"}`}>
+                      {activeConversation.isGroup && !own && (
+                        <span className="message-sender-name">{m.senderName}</span>
+                      )}
+                      {m.text && <p>{m.text}</p>}
+                      {(m.attachments || []).map((a, i) =>
+                        isImageAttachment(a) ? (
+                          <a key={i} href={a.url} target="_blank" rel="noopener noreferrer">
+                            <img src={a.url} alt={a.name} className="attachment-preview" />
+                          </a>
+                        ) : (
+                          <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" className="attachment-file">
+                            <FileText size={16} /> {a.name}
+                          </a>
+                        )
+                      )}
+                    </div>
+                  );
+                })}
                 <div ref={threadEndRef} />
               </div>
 

@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { dbConnect } from "@/lib/mongodb";
 import User from "@/models/User";
 import { ProgressProvider } from "@/components/ProgressContext";
+import { MessagesProvider } from "@/components/MessagesContext";
 import Shell from "@/components/Shell";
 
 export default async function DashboardLayout({ children }) {
@@ -19,7 +20,9 @@ export default async function DashboardLayout({ children }) {
 
   return (
     <ProgressProvider>
-      <Shell>{children}</Shell>
+      <MessagesProvider>
+        <Shell>{children}</Shell>
+      </MessagesProvider>
     </ProgressProvider>
   );
 }

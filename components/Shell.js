@@ -28,8 +28,10 @@ import {
   ChevronDown,
   Bell,
   Gift,
+  MessageCircle,
 } from "lucide-react";
 import { useProgress } from "./ProgressContext";
+import { useMessages } from "./MessagesContext";
 
 const FACEBOOK_GROUP_URL = "https://www.facebook.com/groups/1540342570926998";
 
@@ -42,6 +44,7 @@ const NAV_ITEMS = [
   { href: "/builder", icon: FileText, label: "Document Builder" },
   { href: "/jobboards", icon: Globe, label: "Job Boards" },
   { href: "/interview", icon: Mic, label: "Interview Prep" },
+  { href: "/messages", icon: MessageCircle, label: "Messages" },
   { href: "/tools", icon: Wrench, label: "AI Tools Cheat Sheet" },
   { href: "/salary", icon: DollarSign, label: "Salary Guide" },
   { href: "/trackers", icon: BarChart3, label: "Trackers" },
@@ -114,6 +117,7 @@ export default function Shell({ children }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { state, patch } = useProgress();
+  const { unreadCount } = useMessages();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -184,6 +188,9 @@ export default function Shell({ children }) {
                 className={`nav-item${pathname === item.href ? " active" : ""}`}
               >
                 <Icon size={18} /> <span>{item.label}</span>
+                {item.href === "/messages" && unreadCount > 0 && (
+                  <span className="nav-badge">{unreadCount}</span>
+                )}
               </Link>
             );
           })}

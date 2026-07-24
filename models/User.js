@@ -16,6 +16,7 @@ const UserSchema = new mongoose.Schema(
     paidAt: { type: Date, default: null },
     referralCode: { type: String, unique: true, sparse: true, index: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    lastSeenAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

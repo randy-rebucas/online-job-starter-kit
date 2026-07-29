@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { dbConnect } from "@/lib/mongodb";
 import User from "@/models/User";
+import { reconcileLatestPendingPurchaseForUser } from "@/lib/purchases";
 import BuyKitButton from "@/app/BuyKitButton";
 import SignOutButton from "./SignOutButton";
 
@@ -10,8 +11,16 @@ export default async function BillingPage() {
   if (!session?.user) redirect("/login");
 
   await dbConnect();
-  const user = await User.findById(session.user.id).select("isPaid").lean();
+  let user = await User.findById(session.user.id).select("isPaid").lean();
   if (!user) redirect("/login");
+
+  // Covers the user who paid but never made it back to /download/success and
+  // whose webhook also missed — re-check PayMongo directly instead of leaving
+  // them stuck here with no way to recover short of paying twice.
+  if (!user.isPaid) {
+    const nowPaid = await reconcileLatestPendingPurchaseForUser(session.user.id);
+    if (nowPaid) user = await User.findById(session.user.id).select("isPaid").lean();
+  }
   if (user.isPaid) redirect("/dashboard");
 
   const priceLabel = `₱${process.env.STARTER_KIT_PRICE_PHP || 499}`;

@@ -17,6 +17,8 @@ const UserSchema = new mongoose.Schema(
     referralCode: { type: String, unique: true, sparse: true, index: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     lastSeenAt: { type: Date, default: null },
+    publicSlug: { type: String, unique: true, sparse: true, index: true },
+    isPublicProfile: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TrendingUp, Download, X, RefreshCw, BarChart3, Plus, BellRing } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
+import { STATUS_STAGES, classifyStatus } from "@/lib/trackerStatus";
 
 function makeId() {
   return typeof crypto !== "undefined" && crypto.randomUUID
@@ -34,25 +35,6 @@ function exportCsv(tracker, rows) {
   a.download = `${tracker.id}.csv`;
   a.click();
   URL.revokeObjectURL(url);
-}
-
-// Application Outcome Analytics — status colors follow the app's existing
-// badge semantics (emerald = good, amber = in-progress, red = negative) so
-// this doesn't introduce a second, competing color language.
-const STATUS_STAGES = [
-  { key: "applied", label: "Applied", match: /apply|applied|submit|sent/i, color: "var(--text-dim)", bg: "var(--border)" },
-  { key: "interview", label: "Interview", match: /interview|screen|call/i, color: "#d78228", bg: "rgba(255,171,64,0.18)" },
-  { key: "offer", label: "Offer", match: /offer|hired|accepted/i, color: "var(--emerald)", bg: "rgba(31,174,122,0.15)" },
-  { key: "rejected", label: "Rejected", match: /reject|declin|no\b|ghost/i, color: "#e5484d", bg: "rgba(229,72,77,0.15)" },
-];
-
-function classifyStatus(raw) {
-  const text = (raw || "").trim();
-  if (!text) return "applied";
-  for (const stage of STATUS_STAGES) {
-    if (stage.key !== "applied" && stage.match.test(text)) return stage.key;
-  }
-  return "applied";
 }
 
 function ApplicationAnalytics({ rows, statusColIndex }) {

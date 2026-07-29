@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { auth } from "@/auth";
 import { dbConnect } from "@/lib/mongodb";
 import User from "@/models/User";
@@ -23,7 +23,7 @@ export async function POST(req) {
   const user = await User.findById(session.user.id).select("isPaid").lean();
   if (!user?.isPaid) return NextResponse.json({ error: "No confirmed purchase found." }, { status: 403 });
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json({ error: "AI assistant is not configured yet." }, { status: 503 });
   }
 
@@ -42,22 +42,23 @@ export async function POST(req) {
     return NextResponse.json({ error: "Text is too long to improve at once." }, { status: 400 });
   }
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-  let message;
+  let completion;
   try {
-    message = await client.messages.create({
-      model: "claude-sonnet-5",
-      max_tokens: 1024,
+    completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
       temperature: 0.3,
-      system: SYSTEM_PROMPTS[type],
-      messages: [{ role: "user", content: text }],
+      messages: [
+        { role: "system", content: SYSTEM_PROMPTS[type] },
+        { role: "user", content: text },
+      ],
     });
   } catch {
     return NextResponse.json({ error: "Couldn't reach the AI assistant. Please try again." }, { status: 502 });
   }
 
-  const suggestion = message.content?.[0]?.type === "text" ? message.content[0].text.trim() : "";
+  const suggestion = completion.choices?.[0]?.message?.content?.trim() || "";
   if (!suggestion) return NextResponse.json({ error: "The assistant didn't return a suggestion." }, { status: 502 });
 
   return NextResponse.json({ suggestion });

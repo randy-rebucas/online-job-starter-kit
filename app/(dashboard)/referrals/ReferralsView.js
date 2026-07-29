@@ -1,9 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Gift, Users, Lock } from "lucide-react";
+import { Gift, Users, Lock, Trophy } from "lucide-react";
 import CopyButton from "@/components/CopyButton";
 import { inputClass } from "@/components/formStyles";
+
+function Leaderboard() {
+  const [board, setBoard] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/referrals/leaderboard")
+      .then((res) => res.json())
+      .then(setBoard)
+      .catch(() => {});
+  }, []);
+
+  if (!board?.top?.length) return null;
+
+  return (
+    <div className="card">
+      <div className="section-title" style={{ marginTop: 0 }}>
+        <Trophy size={18} /> Top Referrers
+      </div>
+      <table>
+        <tbody>
+          {board.top.map((r) => (
+            <tr key={r.rank} style={r.isYou ? { fontWeight: 700 } : undefined}>
+              <td style={{ width: 40 }}>#{r.rank}</td>
+              <td>{r.name}{r.isYou ? " (You)" : ""}</td>
+              <td style={{ textAlign: "right", color: "var(--text-dim)" }}>{r.invitedCount} invites</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default function ReferralsView() {
   const [data, setData] = useState(null);
@@ -50,6 +82,8 @@ export default function ReferralsView() {
           <div style={{ width: `${pct}%` }} />
         </div>
       </div>
+
+      <Leaderboard />
 
       <div className="section-title">
         <Gift size={18} /> Reward Tiers

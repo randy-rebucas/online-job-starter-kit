@@ -3,11 +3,13 @@
 import { useMemo, useState } from "react";
 import { Mic, Star, BarChart3 } from "lucide-react";
 import { inputClass } from "@/components/formStyles";
+import VoiceInterviewer from "./VoiceInterviewer";
 
 export default function InterviewView({ questions }) {
   const cats = useMemo(() => ["All", ...new Set(questions.map((q) => q[0]))], [questions]);
   const [catFilter, setCatFilter] = useState("All");
   const [search, setSearch] = useState("");
+  const [tab, setTab] = useState("browse");
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -26,6 +28,20 @@ export default function InterviewView({ questions }) {
       <p className="page-sub">
         {questions.length} questions across {cats.length - 1} categories.
       </p>
+
+      <div className="tabs">
+        <button className={`tab-btn${tab === "browse" ? " active" : ""}`} onClick={() => setTab("browse")}>
+          Browse Questions
+        </button>
+        <button className={`tab-btn${tab === "voice" ? " active" : ""}`} onClick={() => setTab("voice")}>
+          Voice Mock Interview
+        </button>
+      </div>
+
+      {tab === "voice" ? (
+        <VoiceInterviewer questions={questions} />
+      ) : (
+        <>
       <div className="field">
         <input
           id="interview-search"
@@ -110,6 +126,8 @@ export default function InterviewView({ questions }) {
           </tbody>
         </table>
       </div>
+        </>
+      )}
     </>
   );
 }

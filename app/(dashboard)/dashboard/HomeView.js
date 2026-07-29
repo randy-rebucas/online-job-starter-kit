@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Rocket, Calendar, FileText, Bot, BookOpen, Hand, Flame, Award, Users, Sparkles, X } from "lucide-react";
+import { Rocket, Calendar, FileText, Bot, BookOpen, Hand, Flame, Award, Users, Sparkles, X, BellRing } from "lucide-react";
 import { useProgress } from "@/components/ProgressContext";
 import { computeBadges } from "@/lib/badges";
+import { getStaleApplications } from "@/lib/trackerStatus";
 import { DAILY_QUOTES, pickForToday } from "@/lib/dailyMotivation";
 
 const FACEBOOK_GROUP_URL = "https://www.facebook.com/groups/1540342570926998";
@@ -55,6 +56,14 @@ function DailyMotivationCard({ quote, reminderLine, todaysPrompt }) {
 
 export default function HomeView({ chapters, prompts, jobBoardCount, roadmap }) {
   const { state, loading } = useProgress();
+  const [invitedCount, setInvitedCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/referrals")
+      .then((res) => res.json())
+      .then((data) => setInvitedCount(data?.invitedCount || 0))
+      .catch(() => {});
+  }, []);
 
   const totalDays = 30;
   const doneDays = Object.values(state.roadmap).filter(Boolean).length;
@@ -69,8 +78,9 @@ export default function HomeView({ chapters, prompts, jobBoardCount, roadmap }) 
     });
   });
   const checklistPct = totalChecks ? Math.round((doneChecks / totalChecks) * 100) : 0;
-  const badges = computeBadges(state, chapters);
+  const badges = computeBadges(state, chapters, { invitedCount });
   const streak = state.streaks || {};
+  const staleApplications = getStaleApplications(state.trackers);
 
   const quote = pickForToday(DAILY_QUOTES);
   const todaysPrompt = pickForToday(prompts);
@@ -97,6 +107,20 @@ export default function HomeView({ chapters, prompts, jobBoardCount, roadmap }) 
       <p className="page-sub">Your Complete Roadmap from Zero Experience to a Thriving Remote Career</p>
 
       <DailyMotivationCard quote={quote} reminderLine={reminderLine} todaysPrompt={todaysPrompt} />
+
+      {staleApplications.length > 0 && (
+        <div className="card" style={{ borderColor: "#e5484d" }}>
+          <div className="section-title" style={{ marginTop: 0, color: "#e5484d" }}>
+            <BellRing size={18} /> {staleApplications.length} Application{staleApplications.length === 1 ? "" : "s"} Need Follow-up
+          </div>
+          <p style={{ fontSize: 13.5, color: "var(--text-dim)" }}>
+            These have been sitting at &quot;Applied&quot; for over a week. Send a follow-up to keep your pipeline warm.
+          </p>
+          <Link href="/trackers" className="btn small primary" style={{ display: "inline-flex", marginTop: 4 }}>
+            <BellRing size={14} /> Review in Trackers
+          </Link>
+        </div>
+      )}
 
       <div className="grid cols-4">
         <div className="card stat">

@@ -1,8 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { inputClass, selectClass } from "@/components/formStyles";
 import { CURRENT_STATUS_OPTIONS } from "@/lib/currentStatus";
+import CopyButton from "@/components/CopyButton";
+
+function PublicProfileToggle() {
+  const [data, setData] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/user/public-profile")
+      .then((res) => res.json())
+      .then(setData)
+      .catch(() => {});
+  }, []);
+
+  async function toggle(checked) {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/user/public-profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublicProfile: checked }),
+      });
+      const next = await res.json();
+      setData(next);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!data) return null;
+
+  return (
+    <div className="card" style={{ maxWidth: 480, marginTop: 16 }}>
+      <div className="flex-between">
+        <strong>Public Career Profile</strong>
+        <label style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <input
+            type="checkbox"
+            checked={data.isPublicProfile}
+            disabled={saving}
+            onChange={(e) => toggle(e.target.checked)}
+          />
+          {data.isPublicProfile ? "On" : "Off"}
+        </label>
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--text-dim)", marginTop: 6 }}>
+        Share a public page showing your roadmap progress, streak, and badges — great for accountability or LinkedIn.
+      </p>
+      {data.isPublicProfile && data.url && (
+        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+          <input className={inputClass} value={data.url} readOnly onFocus={(e) => e.target.select()} />
+          <CopyButton text={data.url} className="btn small primary copy-btn" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function ProfileView({ name, email, mobileNumber, facebookProfile, currentStatus }) {
   const [form, setForm] = useState({ name, mobileNumber, facebookProfile, currentStatus });
@@ -39,6 +95,7 @@ export default function ProfileView({ name, email, mobileNumber, facebookProfile
   }
 
   return (
+    <>
     <div className="card" style={{ maxWidth: 480 }}>
       <div className="auth-title">Profile</div>
       <p className="auth-sub">Update your contact and status details.</p>
@@ -102,5 +159,7 @@ export default function ProfileView({ name, email, mobileNumber, facebookProfile
         </button>
       </form>
     </div>
+    <PublicProfileToggle />
+    </>
   );
 }
